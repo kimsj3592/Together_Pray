@@ -34,17 +34,40 @@ Last updated: 2026-01-29
 - [x] Prisma schema created with all models (User, Group, GroupMember, PrayerItem, PrayerUpdate, PrayerReaction, Comment)
 - [x] Initial migration generated and applied (20260129074240_init)
 
+### Phase 2: Auth System - Backend Complete ✅
+
+**Backend Auth (완료)**:
+- [x] Auth dependencies installed (JWT, Passport, bcrypt)
+- [x] PrismaService created for database connection
+- [x] UsersService and UsersModule implementation
+- [x] Auth DTOs (SignupDto, LoginDto) with validation
+- [x] Auth Service with bcrypt password hashing
+  - Signup logic with duplicate email check
+  - Login logic with password verification
+  - JWT token generation
+- [x] JWT Strategy and JwtAuthGuard implementation
+- [x] Auth Controller with endpoints:
+  - POST /auth/signup
+  - POST /auth/login
+  - GET /auth/me (protected)
+- [x] ValidationPipe enabled globally
+- [x] Auth Module integrated into App Module
+- [x] Environment variables configured (.env)
+- [x] All endpoints tested and working ✅
+
 ### In Progress 🔄
 None
 
 ### Next Steps 📋
 
-#### Phase 2: Auth System (2-3일)
-- [ ] User entity implementation
-- [ ] Auth module setup (signup, login, JWT)
-- [ ] Auth guards and decorators
-- [ ] Frontend auth pages (signup, login)
-- [ ] Protected route implementation
+#### Phase 2: Frontend Auth (1-2일)
+- [ ] Create API client utility
+- [ ] Implement Auth Context/Provider
+- [ ] Build Signup page (/signup)
+- [ ] Build Login page (/login)
+- [ ] Implement token storage (localStorage)
+- [ ] Create Protected Route wrapper
+- [ ] Test full auth flow
 
 ---
 
@@ -53,7 +76,7 @@ None
 | Phase | Status | Progress |
 |-------|--------|----------|
 | Phase 1: Project Setup | ✅ Complete | 100% |
-| Phase 2: Auth System | 🔄 Starting | 0% |
+| Phase 2: Auth System | 🔄 In Progress | 50% (Backend ✅, Frontend Pending) |
 | Phase 3: Group Features | ⏳ Pending | 0% |
 | Phase 4: Prayer Core | ⏳ Pending | 0% |
 | Phase 5: Updates | ⏳ Pending | 0% |
