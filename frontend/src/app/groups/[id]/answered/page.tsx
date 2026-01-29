@@ -5,21 +5,9 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import PrayButton from '@/components/PrayButton';
-import { api, PrayerItem, PrayerStatus, Group } from '@/lib/api';
+import { api, PrayerItem, Group } from '@/lib/api';
 
-const STATUS_LABELS: Record<PrayerStatus, string> = {
-  praying: '기도중',
-  partial_answer: '부분 응답',
-  answered: '응답 완료',
-};
-
-const STATUS_COLORS: Record<PrayerStatus, string> = {
-  praying: 'bg-blue-100 text-blue-800',
-  partial_answer: 'bg-yellow-100 text-yellow-800',
-  answered: 'bg-green-100 text-green-800',
-};
-
-function PrayerListPage() {
+function AnsweredPrayersPage() {
   const params = useParams();
   const groupId = params.id as string;
 
@@ -27,7 +15,6 @@ function PrayerListPage() {
   const [items, setItems] = useState<PrayerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [statusFilter, setStatusFilter] = useState<PrayerStatus | ''>('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -36,8 +23,8 @@ function PrayerListPage() {
   }, [groupId]);
 
   useEffect(() => {
-    loadPrayerItems();
-  }, [groupId, statusFilter, page]);
+    loadAnsweredPrayers();
+  }, [groupId, page]);
 
   const loadGroup = async () => {
     try {
@@ -48,26 +35,21 @@ function PrayerListPage() {
     }
   };
 
-  const loadPrayerItems = async () => {
+  const loadAnsweredPrayers = async () => {
     try {
       setLoading(true);
       const response = await api.getPrayerItems(groupId, {
-        status: statusFilter || undefined,
+        status: 'answered',
         page,
         limit: 20,
       });
       setItems(response.items);
       setTotalPages(response.totalPages);
     } catch (err: any) {
-      setError(err.message || '기도제목을 불러올 수 없습니다.');
+      setError(err.message || '응답된 기도를 불러올 수 없습니다.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFilterChange = (status: PrayerStatus | '') => {
-    setStatusFilter(status);
-    setPage(1);
   };
 
   if (error && !group) {
@@ -88,79 +70,44 @@ function PrayerListPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <Link href={`/groups/${groupId}`} className="text-blue-600 hover:text-blue-500">
-              ← {group?.name || '그룹'}으로
-            </Link>
-            <Link
-              href={`/groups/${groupId}/prayers/new`}
-              className="min-h-[44px] px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-            >
-              + 기도제목 작성
-            </Link>
-          </div>
-          <Link
-            href={`/groups/${groupId}/answered`}
-            className="inline-flex items-center px-4 py-2 border border-green-600 rounded-md text-sm font-medium text-green-600 hover:bg-green-50 transition-colors"
-          >
-            <svg
-              className="mr-2 h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            응답된 기도 보기
+        <div className="mb-6 flex items-center justify-between">
+          <Link href={`/groups/${groupId}/prayers`} className="text-blue-600 hover:text-blue-500">
+            ← 기도제목 목록으로
           </Link>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">기도제목</h1>
-
-        <div className="mb-6 flex flex-wrap gap-2">
-          <button
-            onClick={() => handleFilterChange('')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              statusFilter === ''
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            전체
-          </button>
-          {(Object.keys(STATUS_LABELS) as PrayerStatus[]).map((status) => (
-            <button
-              key={status}
-              onClick={() => handleFilterChange(status)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                statusFilter === status
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {STATUS_LABELS[status]}
-            </button>
-          ))}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">응답된 기도</h1>
+          <p className="text-gray-600">
+            {group?.name && `${group.name} 그룹의 `}응답 완료된 기도제목을 확인하세요
+          </p>
         </div>
 
         {loading ? (
           <div className="text-center py-12 text-gray-500">로딩 중...</div>
         ) : items.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">
-              {statusFilter ? '해당 상태의 기도제목이 없습니다.' : '아직 기도제목이 없습니다.'}
-            </p>
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-gray-500 mb-4">아직 응답된 기도가 없습니다</p>
             <Link
-              href={`/groups/${groupId}/prayers/new`}
+              href={`/groups/${groupId}/prayers`}
               className="text-blue-600 hover:text-blue-500"
             >
-              첫 기도제목을 작성해보세요
+              기도제목 목록으로 돌아가기
             </Link>
           </div>
         ) : (
@@ -170,24 +117,20 @@ function PrayerListPage() {
                 key={item.id}
                 className="bg-white rounded-lg shadow hover:shadow-md transition-shadow"
               >
-                <Link href={`/prayers/${item.id}`} className="block p-6">
+                <Link href={`/prayers/${item.id}`} className="block p-4 md:p-6">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 flex-1 pr-2">
                       {item.title}
                     </h3>
-                    <span
-                      className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        STATUS_COLORS[item.status]
-                      }`}
-                    >
-                      {STATUS_LABELS[item.status]}
+                    <span className="flex-shrink-0 ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      응답 완료
                     </span>
                   </div>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                     {item.content}
                   </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <div className="flex items-center space-x-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-gray-500">
+                    <div className="flex items-center space-x-3">
                       <span>{item.author.name}</span>
                       {item.category && (
                         <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
@@ -200,11 +143,13 @@ function PrayerListPage() {
                         🙏 {item._count.reactions}회
                       </span>
                       <span className="text-gray-400">·</span>
-                      <span>{new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
+                      <span className="text-xs sm:text-sm">
+                        응답: {new Date(item.updatedAt).toLocaleDateString('ko-KR')}
+                      </span>
                     </div>
                   </div>
                 </Link>
-                <div className="px-6 pb-4">
+                <div className="px-4 md:px-6 pb-4">
                   <PrayButton
                     prayerItemId={item.id}
                     initialPrayCount={item._count.reactions}
@@ -235,7 +180,7 @@ function PrayerListPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-[44px] px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               이전
             </button>
@@ -245,7 +190,7 @@ function PrayerListPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-[44px] px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               다음
             </button>
@@ -256,10 +201,10 @@ function PrayerListPage() {
   );
 }
 
-export default function PrayerList() {
+export default function AnsweredPrayers() {
   return (
     <ProtectedRoute>
-      <PrayerListPage />
+      <AnsweredPrayersPage />
     </ProtectedRoute>
   );
 }

@@ -112,12 +112,18 @@ function GroupDetailPage() {
               </div>
             </div>
 
-            <div className="mb-8">
+            <div className="mb-8 space-y-3">
               <Link
                 href={`/groups/${groupId}/prayers`}
                 className="block w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-center font-medium rounded-lg transition-colors"
               >
                 기도제목 보기
+              </Link>
+              <Link
+                href={`/groups/${groupId}/answered`}
+                className="block w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white text-center font-medium rounded-lg transition-colors"
+              >
+                응답된 기도 보기
               </Link>
             </div>
 
