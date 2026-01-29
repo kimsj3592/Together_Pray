@@ -201,11 +201,39 @@ Last updated: 2026-01-29
   - Flexible layout for mobile/desktop
 - [x] Frontend build verified ✅
 
+### Phase 9: My Page (마이페이지) - Complete ✅
+
+**Backend Mypage (기존 Phase 8에서 구현됨)**:
+- [x] User endpoints:
+  - GET /users/me/prayer-items - Get my prayer items
+  - GET /users/me/prayed-items - Get prayed items
+  - PATCH /users/me - Update profile
+
+**Frontend Mypage (완료)**:
+- [x] API client extended with mypage methods
+  - getMyPrayerItems(page, limit)
+  - getMyPrayedItems(page, limit)
+  - updateProfile(name)
+- [x] AuthContext updated with refreshUser function
+- [x] Mypage (/mypage)
+  - User profile card with avatar
+  - Tab navigation (내 기도제목, 기도한 기도제목, 프로필 설정)
+  - Prayer list with group info and status badges
+  - Pagination for both tabs
+  - Profile edit form with name update
+  - Mobile-first responsive design
+- [x] Groups page navigation updated
+  - User name now links to /mypage
+  - Hover effect added
+- [x] Frontend build verified ✅
+
 ### In Progress 🔄
 None
 
 ### Next Steps 📋
-- Phase 6: Pray Together (함께 기도하기 버튼) - Backend already implemented, Frontend completed
+- Phase 7: Answered Prayers collection view
+- Phase 10: Testing and quality assurance
+- Phase 11: Deployment preparation
 
 ---
 
@@ -221,7 +249,7 @@ None
 | Phase 6: Pray Together | ✅ Complete | 100% |
 | Phase 7: Answered Prayers | ⏳ Pending | 0% |
 | Phase 8: Comments (Optional) | ⏳ Pending | 0% |
-| Phase 9: My Page | ⏳ Pending | 0% |
+| Phase 9: My Page | ✅ Complete | 100% |
 | Phase 10: Testing | ⏳ Pending | 0% |
 | Phase 11: Deployment | ⏳ Pending | 0% |
 | Phase 12: PoC Operation | ⏳ Pending | 0% |

@@ -44,7 +44,12 @@ function GroupsListPage() {
               <h1 className="text-xl font-bold text-gray-900">Together Pray</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">{user?.name}님</span>
+              <Link
+                href="/mypage"
+                className="text-gray-700 hover:text-gray-900 font-medium"
+              >
+                {user?.name}님
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"

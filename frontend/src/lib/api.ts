@@ -277,6 +277,40 @@ class ApiClient {
       }
     );
   }
+
+  // Mypage
+  async getMyPrayerItems(page?: number, limit?: number): Promise<PrayerItemsResponse> {
+    const params = new URLSearchParams();
+    if (page) params.append('page', page.toString());
+    if (limit) params.append('limit', limit.toString());
+
+    const query = params.toString();
+    const endpoint = `/users/me/prayer-items${query ? `?${query}` : ''}`;
+
+    return this.request<PrayerItemsResponse>(endpoint, {
+      method: 'GET',
+    });
+  }
+
+  async getMyPrayedItems(page?: number, limit?: number): Promise<PrayerItemsResponse> {
+    const params = new URLSearchParams();
+    if (page) params.append('page', page.toString());
+    if (limit) params.append('limit', limit.toString());
+
+    const query = params.toString();
+    const endpoint = `/users/me/prayed-items${query ? `?${query}` : ''}`;
+
+    return this.request<PrayerItemsResponse>(endpoint, {
+      method: 'GET',
+    });
+  }
+
+  async updateProfile(name: string): Promise<{ user: AuthResponse['user'] }> {
+    return this.request<{ user: AuthResponse['user'] }>('/users/me', {
+      method: 'PATCH',
+      body: JSON.stringify({ name }),
+    });
+  }
 }
 
 export const api = new ApiClient(API_URL);
