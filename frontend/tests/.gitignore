@@ -1,0 +1,10 @@
+# Playwright Test Artifacts
+playwright-report/
+test-results/
+*.mp4
+*.webm
+trace.zip
+
+# Test screenshots
+screenshots/
+downloads/
