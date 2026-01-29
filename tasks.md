@@ -2,7 +2,7 @@
 
 Last updated: 2026-01-29
 
-## Current Status: Phase 1 Complete ✅ → Moving to Phase 2
+## Current Status: Phase 4 Complete ✅ → Moving to Phase 5
 
 ### Phase 1: Project Setup - Completed ✅
 - [x] IMPLEMENTATION_PLAN.md created
@@ -121,10 +121,56 @@ Last updated: 2026-01-29
 - [x] Home page redirects to /groups
 - [x] Full group flow tested ✅
 
+### Phase 4: Prayer Core Features - Complete ✅
+
+**Backend Prayer Items (완료)**:
+- [x] Prayer Items module structure created (prayer-items/)
+- [x] DTOs created (CreatePrayerItemDto, UpdatePrayerStatusDto)
+- [x] Prayer Items Service implementation
+  - Create prayer item with group membership check
+  - List prayer items by group with pagination
+  - Get prayer item detail with hasPrayedToday flag
+  - Update prayer status (author/admin only)
+  - Delete prayer item (author only)
+  - Anonymous post support (hide author name from others)
+- [x] Prayer Items Controller with endpoints:
+  - POST /prayer-items - Create prayer item
+  - GET /prayer-items/group/:groupId - List by group (with status filter)
+  - GET /prayer-items/:id - Get prayer detail
+  - PATCH /prayer-items/:id/status - Update status
+  - DELETE /prayer-items/:id - Delete prayer
+- [x] Prayer Items Module integrated into App Module
+- [x] ConfigService integration for JWT (fixed auth issue)
+- [x] All endpoints tested and working ✅
+
+**Frontend Prayer Items (완료)**:
+- [x] API client extended with prayer item methods
+  - createPrayerItem, getPrayerItems, getPrayerItem
+  - updatePrayerStatus, deletePrayerItem
+- [x] Prayer list page (/groups/:id/prayers)
+  - Display all prayer items in group
+  - Status filter buttons (전체/기도중/부분 응답/응답 완료)
+  - Pagination support
+  - Link to create new prayer
+- [x] Prayer create page (/groups/:id/prayers/new)
+  - Title and content input
+  - Category selection (8 categories)
+  - Anonymous post option
+  - Validation and error handling
+- [x] Prayer detail page (/prayers/:id)
+  - Full prayer content display
+  - Status badge and category display
+  - Status change dropdown (for author)
+  - Delete button with confirmation modal
+- [x] Group detail page updated with "기도제목 보기" button
+- [x] Frontend build verified ✅
+
 ### In Progress 🔄
 None
 
 ### Next Steps 📋
+- Phase 5: Updates (기도제목 업데이트 타임라인)
+- Phase 6: Pray Together (함께 기도하기 버튼)
 
 ---
 
@@ -135,7 +181,7 @@ None
 | Phase 1: Project Setup | ✅ Complete | 100% |
 | Phase 2: Auth System | ✅ Complete | 100% |
 | Phase 3: Group Features | ✅ Complete | 100% |
-| Phase 4: Prayer Core | ⏳ Pending | 0% |
+| Phase 4: Prayer Core | ✅ Complete | 100% |
 | Phase 5: Updates | ⏳ Pending | 0% |
 | Phase 6: Pray Together | ⏳ Pending | 0% |
 | Phase 7: Answered Prayers | ⏳ Pending | 0% |

@@ -97,7 +97,7 @@ function GroupDetailPage() {
               <p className="text-gray-600 mb-6">{group.description}</p>
             )}
 
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="text-sm text-gray-500">멤버 수</div>
                 <div className="text-2xl font-bold text-gray-900">
@@ -110,6 +110,15 @@ function GroupDetailPage() {
                   {group._count?.prayerItems || 0}개
                 </div>
               </div>
+            </div>
+
+            <div className="mb-8">
+              <Link
+                href={`/groups/${groupId}/prayers`}
+                className="block w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-center font-medium rounded-lg transition-colors"
+              >
+                기도제목 보기
+              </Link>
             </div>
 
             {isAdmin && (
@@ -163,11 +172,6 @@ function GroupDetailPage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 px-6 py-4">
-            <p className="text-sm text-gray-500">
-              Phase 3: 그룹 기능 구현 완료 ✅
-            </p>
-          </div>
         </div>
       </div>
     </div>
