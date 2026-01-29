@@ -1,15 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Plus, Users, UserPlus, Heart, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Header from '@/components/Header';
+import BottomNav from '@/components/BottomNav';
+import EmptyState from '@/components/EmptyState';
+import { GroupListSkeleton } from '@/components/Skeleton';
 import { api, Group } from '@/lib/api';
 
 function GroupsListPage() {
-  const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,104 +34,149 @@ function GroupsListPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
-
   return (
-    <main className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Together Pray</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/mypage"
-                className="text-gray-700 hover:text-gray-900 font-medium"
-              >
-                {user?.name}님
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-              >
-                로그아웃
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-secondary pb-20 md:pb-6">
+      <Header />
 
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">내 그룹</h2>
-          <div className="space-x-3">
-            <Link
-              href="/groups/join"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              그룹 참여
-            </Link>
-            <Link
-              href="/groups/create"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-            >
-              새 그룹 만들기
-            </Link>
-          </div>
+      <main className="max-w-4xl mx-auto px-4 py-6">
+        {/* Welcome Section */}
+        <div className="mb-6">
+          <h2
+            className="text-2xl font-bold mb-1"
+            style={{ color: 'rgb(var(--color-text-primary))' }}
+          >
+            안녕하세요, {user?.name}님
+          </h2>
+          <p style={{ color: 'rgb(var(--color-text-secondary))' }}>
+            함께 기도하는 공동체에 오신 것을 환영합니다
+          </p>
         </div>
 
+        {/* Action Buttons */}
+        <div className="flex gap-3 mb-8">
+          <Link href="/groups/create" className="flex-1">
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              <Plus size={20} />
+              <span>새 그룹 만들기</span>
+            </motion.button>
+          </Link>
+          <Link href="/groups/join">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="btn-secondary flex items-center gap-2"
+            >
+              <UserPlus size={20} />
+              <span className="hidden sm:inline">그룹 참여</span>
+            </motion.button>
+          </Link>
+        </div>
+
+        {/* Error State */}
         {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div
+            className="p-4 rounded-xl mb-6"
+            style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              color: 'rgb(var(--color-accent-red))',
+            }}
+          >
             {error}
           </div>
         )}
 
+        {/* Groups Section */}
+        <div className="mb-4">
+          <h3
+            className="text-lg font-semibold"
+            style={{ color: 'rgb(var(--color-text-primary))' }}
+          >
+            내 그룹
+          </h3>
+        </div>
+
         {loading ? (
-          <div className="text-center py-12">
-            <div className="text-gray-600">로딩 중...</div>
-          </div>
+          <GroupListSkeleton count={3} />
         ) : groups.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
-            <p className="text-gray-500 mb-4">아직 참여한 그룹이 없습니다.</p>
-            <p className="text-gray-400 text-sm">
-              새로운 그룹을 만들거나 초대 코드로 그룹에 참여하세요.
-            </p>
-          </div>
+          <EmptyState
+            type="groups"
+            actionLabel="새 그룹 만들기"
+            actionHref="/groups/create"
+          />
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {groups.map((group) => (
-              <Link
-                key={group.id}
-                href={`/groups/${group.id}`}
-                className="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {group.name}
-                </h3>
-                {group.description && (
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {group.description}
-                  </p>
-                )}
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>멤버 {group._count?.members || group.members.length}명</span>
-                  <span>기도제목 {group._count?.prayerItems || 0}개</span>
-                </div>
-                {group.members.find((m) => m.userId === user?.id)?.role === 'admin' && (
-                  <div className="mt-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    관리자
-                  </div>
-                )}
-              </Link>
-            ))}
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            {groups.map((group, index) => {
+              const isAdmin = group.members.find((m) => m.userId === user?.id)?.role === 'admin';
+
+              return (
+                <motion.div
+                  key={group.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Link href={`/groups/${group.id}`}>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="card p-5 h-full cursor-pointer"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <h3
+                          className="text-lg font-semibold line-clamp-1"
+                          style={{ color: 'rgb(var(--color-text-primary))' }}
+                        >
+                          {group.name}
+                        </h3>
+                        {isAdmin && (
+                          <span className="badge-praying flex items-center gap-1">
+                            <Shield size={12} />
+                            관리자
+                          </span>
+                        )}
+                      </div>
+
+                      {group.description && (
+                        <p
+                          className="text-sm mb-4 line-clamp-2"
+                          style={{ color: 'rgb(var(--color-text-secondary))' }}
+                        >
+                          {group.description}
+                        </p>
+                      )}
+
+                      <div
+                        className="flex items-center gap-4 text-sm"
+                        style={{ color: 'rgb(var(--color-text-tertiary))' }}
+                      >
+                        <span className="flex items-center gap-1">
+                          <Users size={16} />
+                          {group._count?.members || group.members.length}명
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart size={16} />
+                          {group._count?.prayerItems || 0}개
+                        </span>
+                      </div>
+                    </motion.div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         )}
-      </div>
-    </main>
+      </main>
+
+      <BottomNav />
+    </div>
   );
 }
 

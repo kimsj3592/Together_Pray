@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Mail, Lock, LogIn, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
@@ -31,71 +33,151 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            로그인
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Together Pray 계정으로 로그인하세요
+    <div className="min-h-screen flex items-center justify-center bg-secondary px-4 py-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        {/* Logo & Title */}
+        <div className="text-center mb-8">
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.1, type: 'spring' }}
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            style={{ backgroundColor: 'rgb(var(--color-accent-blue))' }}
+          >
+            <Heart size={32} className="text-white" />
+          </motion.div>
+          <h1
+            className="text-2xl font-bold mb-2"
+            style={{ color: 'rgb(var(--color-text-primary))' }}
+          >
+            Together Pray
+          </h1>
+          <p style={{ color: 'rgb(var(--color-text-secondary))' }}>
+            함께 기도하는 공동체에 오신 것을 환영합니다
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          <div className="space-y-4">
+
+        {/* Login Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="card p-6"
+        >
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="p-4 rounded-xl text-sm"
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  color: 'rgb(var(--color-accent-red))',
+                }}
+              >
+                {error}
+              </motion.div>
+            )}
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium mb-2"
+                style={{ color: 'rgb(var(--color-text-primary))' }}
+              >
                 이메일
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
+              <div className="relative">
+                <Mail
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2"
+                  style={{ color: 'rgb(var(--color-text-tertiary))' }}
+                />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="input pl-12"
+                  placeholder="example@email.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
             </div>
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium mb-2"
+                style={{ color: 'rgb(var(--color-text-primary))' }}
+              >
                 비밀번호
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+              <div className="relative">
+                <Lock
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2"
+                  style={{ color: 'rgb(var(--color-text-tertiary))' }}
+                />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="input pl-12"
+                  placeholder="비밀번호를 입력하세요"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {loading ? '로그인 중...' : '로그인'}
-            </button>
-          </div>
+              {loading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                >
+                  <LogIn size={20} />
+                </motion.div>
+              ) : (
+                <LogIn size={20} />
+              )}
+              <span>{loading ? '로그인 중...' : '로그인'}</span>
+            </motion.button>
+          </form>
+        </motion.div>
 
-          <div className="text-center text-sm">
-            <span className="text-gray-600">계정이 없으신가요? </span>
-            <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-              회원가입
-            </Link>
-          </div>
-        </form>
-      </div>
+        {/* Sign Up Link */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-center mt-6"
+        >
+          <span style={{ color: 'rgb(var(--color-text-secondary))' }}>
+            계정이 없으신가요?{' '}
+          </span>
+          <Link
+            href="/signup"
+            className="font-medium hover:underline"
+            style={{ color: 'rgb(var(--color-accent-blue))' }}
+          >
+            회원가입
+          </Link>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

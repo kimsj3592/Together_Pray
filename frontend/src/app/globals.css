@@ -1,3 +1,333 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "@fontsource/pretendard/400.css";
+@import "@fontsource/pretendard/500.css";
+@import "@fontsource/pretendard/600.css";
+@import "@fontsource/pretendard/700.css";
+@import "tailwindcss";
+
+@theme {
+  /* Colors - Light Mode defaults */
+  --color-bg-primary: 255 255 255;
+  --color-bg-secondary: 249 250 251;
+  --color-bg-tertiary: 243 244 246;
+  --color-bg-card: 255 255 255;
+
+  --color-text-primary: 17 24 39;
+  --color-text-secondary: 107 114 128;
+  --color-text-tertiary: 156 163 175;
+
+  --color-border: 229 231 235;
+  --color-border-light: 243 244 246;
+
+  --color-accent-blue: 59 130 246;
+  --color-accent-blue-hover: 37 99 235;
+  --color-accent-green: 16 185 129;
+  --color-accent-green-hover: 5 150 105;
+  --color-accent-yellow: 245 158 11;
+  --color-accent-red: 239 68 68;
+
+  /* Status Colors */
+  --color-status-praying-bg: 219 234 254;
+  --color-status-praying-text: 30 64 175;
+  --color-status-partial-bg: 254 249 195;
+  --color-status-partial-text: 161 98 7;
+  --color-status-answered-bg: 209 250 229;
+  --color-status-answered-text: 6 95 70;
+
+  /* Glass effect */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.2);
+
+  /* Animations */
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-pray-pulse: pray-pulse 2s ease-in-out infinite;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-bg-primary: 17 24 39;
+  --color-bg-secondary: 31 41 55;
+  --color-bg-tertiary: 55 65 81;
+  --color-bg-card: 31 41 55;
+
+  --color-text-primary: 249 250 251;
+  --color-text-secondary: 156 163 175;
+  --color-text-tertiary: 107 114 128;
+
+  --color-border: 55 65 81;
+  --color-border-light: 75 85 99;
+
+  --color-accent-blue: 96 165 250;
+  --color-accent-blue-hover: 147 197 253;
+  --color-accent-green: 52 211 153;
+  --color-accent-green-hover: 110 231 183;
+  --color-accent-yellow: 251 191 36;
+  --color-accent-red: 248 113 113;
+
+  /* Status Colors - Dark */
+  --color-status-praying-bg: 30 58 138;
+  --color-status-praying-text: 191 219 254;
+  --color-status-partial-bg: 113 63 18;
+  --color-status-partial-text: 253 224 71;
+  --color-status-answered-bg: 6 78 59;
+  --color-status-answered-text: 167 243 208;
+
+  /* Glass effect - Dark */
+  --glass-bg: rgba(31, 41, 55, 0.8);
+  --glass-border: rgba(55, 65, 81, 0.5);
+}
+
+* {
+  border-color: rgb(var(--color-border));
+}
+
+html {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  background-color: rgb(var(--color-bg-secondary));
+  color: rgb(var(--color-text-primary));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Card styles */
+.card {
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: all 0.2s ease;
+  background-color: rgb(var(--color-bg-card));
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Glass effect */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Primary button */
+.btn-primary {
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  color: white;
+  transition: all 0.2s ease;
+  background-color: rgb(var(--color-accent-blue));
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary:hover {
+  background-color: rgb(var(--color-accent-blue-hover));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary button */
+.btn-secondary {
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background-color: rgb(var(--color-bg-tertiary));
+  color: rgb(var(--color-text-primary));
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(var(--color-border));
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Success button */
+.btn-success {
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  color: white;
+  transition: all 0.2s ease;
+  background-color: rgb(var(--color-accent-green));
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-success:hover {
+  background-color: rgb(var(--color-accent-green-hover));
+}
+
+/* Input styles */
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  background-color: rgb(var(--color-bg-primary));
+  border: 1px solid rgb(var(--color-border));
+  color: rgb(var(--color-text-primary));
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgb(var(--color-accent-blue));
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input::placeholder {
+  color: rgb(var(--color-text-tertiary));
+}
+
+/* Status badges */
+.badge-praying {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: rgb(var(--color-status-praying-bg));
+  color: rgb(var(--color-status-praying-text));
+}
+
+.badge-partial {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: rgb(var(--color-status-partial-bg));
+  color: rgb(var(--color-status-partial-text));
+}
+
+.badge-answered {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: rgb(var(--color-status-answered-bg));
+  color: rgb(var(--color-status-answered-text));
+}
+
+/* Skeleton loading */
+.skeleton {
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    90deg,
+    rgb(var(--color-bg-tertiary)) 25%,
+    rgb(var(--color-border)) 50%,
+    rgb(var(--color-bg-tertiary)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Bottom navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--glass-border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+  transition: color 0.2s ease;
+  color: rgb(var(--color-text-secondary));
+}
+
+.bottom-nav-item.active {
+  color: rgb(var(--color-accent-blue));
+}
+
+.bottom-nav-item:hover {
+  color: rgb(var(--color-accent-blue));
+}
+
+/* Theme background colors */
+.bg-primary {
+  background-color: rgb(var(--color-bg-primary));
+}
+
+.bg-secondary {
+  background-color: rgb(var(--color-bg-secondary));
+}
+
+.bg-tertiary {
+  background-color: rgb(var(--color-bg-tertiary));
+}
+
+/* Pulse animation for pray button */
+.animate-pray-pulse {
+  animation: pray-pulse 2s ease-in-out infinite;
+}
+
+/* Safe area padding for mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Hide scrollbar but allow scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pray-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}

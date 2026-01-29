@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Heart, Check, Users, X } from 'lucide-react';
 import { api } from '@/lib/api';
 
 interface PrayButtonProps {
@@ -21,7 +23,7 @@ export default function PrayButton({
   const [prayCount, setPrayCount] = useState(initialPrayCount);
   const [hasPrayedToday, setHasPrayedToday] = useState(initialHasPrayedToday);
   const [praying, setPraying] = useState(false);
-  const [showAnimation, setShowAnimation] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [showPrayersList, setShowPrayersList] = useState(false);
   const [prayersList, setPrayersList] = useState<
     { id: string; name: string; prayedAt: string }[]
@@ -40,9 +42,9 @@ export default function PrayButton({
 
       setPrayCount(result.prayCount);
       setHasPrayedToday(result.hasPrayedToday);
-      setShowAnimation(true);
+      setShowCelebration(true);
 
-      setTimeout(() => setShowAnimation(false), 1000);
+      setTimeout(() => setShowCelebration(false), 2000);
 
       if (onPraySuccess) {
         onPraySuccess(result.prayCount);
@@ -50,9 +52,8 @@ export default function PrayButton({
     } catch (err: any) {
       if (err.message.includes('Already prayed')) {
         setHasPrayedToday(true);
-        alert('오늘 이미 이 기도제목을 위해 기도하셨습니다.');
       } else {
-        alert(err.message || '기도 등록에 실패했습니다.');
+        console.error(err.message || '기도 등록에 실패했습니다.');
       }
     } finally {
       setPraying(false);
@@ -71,7 +72,7 @@ export default function PrayButton({
       setPrayersList(list);
       setShowPrayersList(true);
     } catch (err: any) {
-      alert(err.message || '기도 목록을 불러올 수 없습니다.');
+      console.error(err.message || '기도 목록을 불러올 수 없습니다.');
     } finally {
       setLoadingList(false);
     }
@@ -82,99 +83,204 @@ export default function PrayButton({
   return (
     <>
       <div className={`flex items-center gap-2 ${isSmall ? 'flex-row' : 'flex-col sm:flex-row'}`}>
-        <button
+        <motion.button
           onClick={handlePray}
           disabled={hasPrayedToday || praying}
+          whileHover={!hasPrayedToday ? { scale: 1.02 } : {}}
+          whileTap={!hasPrayedToday ? { scale: 0.95 } : {}}
           className={`
-            ${isSmall ? 'px-3 py-1.5 text-sm flex-1' : 'min-h-[44px] px-6 py-3 text-base w-full sm:flex-1'}
-            flex items-center justify-center gap-2
-            rounded-md font-medium
-            transition-all duration-200
+            ${isSmall ? 'px-4 py-2 text-sm' : 'min-h-[48px] px-6 py-3 text-base w-full sm:flex-1'}
+            relative flex items-center justify-center gap-2
+            rounded-xl font-medium
+            transition-all duration-300
+            overflow-hidden
             ${
               hasPrayedToday
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
+                ? 'bg-tertiary cursor-default'
+                : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md hover:shadow-lg'
             }
-            ${praying ? 'opacity-75' : ''}
-            ${showAnimation ? 'scale-105' : ''}
+            ${!hasPrayedToday && !praying ? 'animate-pray-pulse' : ''}
           `}
+          style={hasPrayedToday ? { color: 'rgb(var(--color-text-secondary))' } : {}}
         >
-          <span className={`${showAnimation ? 'animate-bounce' : ''}`}>
-            {hasPrayedToday ? '✓' : '🙏'}
-          </span>
-          <span>
-            {hasPrayedToday ? '오늘 기도완료' : praying ? '기도 중...' : '함께 기도하기'}
-          </span>
-          {!isSmall && (
-            <span
-              className={`
-                px-2 py-0.5 rounded-full text-xs
-                ${hasPrayedToday ? 'bg-gray-400 text-white' : 'bg-blue-500 text-white'}
-              `}
-            >
-              {prayCount}회
-            </span>
-          )}
-        </button>
+          <AnimatePresence mode="wait">
+            {hasPrayedToday ? (
+              <motion.span
+                key="completed"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center gap-2"
+              >
+                <Check size={isSmall ? 16 : 20} />
+                <span>오늘 기도완료</span>
+              </motion.span>
+            ) : praying ? (
+              <motion.span
+                key="praying"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                >
+                  <Heart size={isSmall ? 16 : 20} />
+                </motion.div>
+                <span>기도 중...</span>
+              </motion.span>
+            ) : (
+              <motion.span
+                key="ready"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2"
+              >
+                <Heart size={isSmall ? 16 : 20} />
+                <span>함께 기도하기</span>
+              </motion.span>
+            )}
+          </AnimatePresence>
+
+          {/* Celebration effect */}
+          <AnimatePresence>
+            {showCelebration && (
+              <>
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                    animate={{
+                      opacity: 0,
+                      scale: 1,
+                      x: Math.cos((i / 6) * Math.PI * 2) * 60,
+                      y: Math.sin((i / 6) * Math.PI * 2) * 60,
+                    }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    className="absolute text-lg pointer-events-none"
+                  >
+                    {i % 2 === 0 ? '🙏' : '✨'}
+                  </motion.div>
+                ))}
+              </>
+            )}
+          </AnimatePresence>
+        </motion.button>
 
         {prayCount > 0 && (
-          <button
+          <motion.button
             onClick={handleShowPrayersList}
             disabled={loadingList}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={`
-              ${isSmall ? 'px-3 py-1.5 text-sm' : 'min-h-[44px] px-4 py-3 text-base w-full sm:w-auto'}
-              flex items-center justify-center gap-1
-              rounded-md font-medium
-              border border-gray-300 text-gray-700
-              hover:bg-gray-50
-              transition-colors duration-200
+              ${isSmall ? 'px-3 py-2 text-sm' : 'min-h-[48px] px-4 py-3 text-base w-full sm:w-auto'}
+              flex items-center justify-center gap-2
+              rounded-xl font-medium
+              btn-secondary
               disabled:opacity-50
             `}
           >
-            <span>{loadingList ? '로딩...' : `${prayCount}명 보기`}</span>
-          </button>
+            <Users size={isSmall ? 14 : 18} />
+            <span>{loadingList ? '로딩...' : `${prayCount}명`}</span>
+          </motion.button>
         )}
       </div>
 
-      {showPrayersList && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowPrayersList(false)}
-        >
-          <div
-            className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+      {/* Prayer List Modal */}
+      <AnimatePresence>
+        {showPrayersList && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowPrayersList(false)}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">함께 기도한 사람들</h3>
-              <button
-                onClick={() => setShowPrayersList(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            </div>
+            <div
+              className="absolute inset-0"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+            />
 
-            {prayersList.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">아직 기도한 사람이 없습니다.</p>
-            ) : (
-              <div className="space-y-2">
-                {prayersList.map((prayer) => (
-                  <div
-                    key={`${prayer.id}-${prayer.prayedAt}`}
-                    className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
-                  >
-                    <span className="font-medium text-gray-900">{prayer.name}</span>
-                    <span className="text-sm text-gray-500">
-                      {new Date(prayer.prayedAt).toLocaleDateString('ko-KR')}
-                    </span>
-                  </div>
-                ))}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="card relative w-full max-w-md max-h-[80vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="sticky top-0 flex items-center justify-between p-4 border-b bg-primary"
+                style={{ borderColor: 'rgb(var(--color-border))' }}
+              >
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: 'rgb(var(--color-text-primary))' }}
+                >
+                  함께 기도한 사람들
+                </h3>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowPrayersList(false)}
+                  className="p-2 rounded-lg hover:bg-tertiary transition-colors"
+                  style={{ color: 'rgb(var(--color-text-secondary))' }}
+                >
+                  <X size={20} />
+                </motion.button>
               </div>
-            )}
-          </div>
-        </div>
-      )}
+
+              <div className="p-4 overflow-y-auto max-h-[60vh]">
+                {prayersList.length === 0 ? (
+                  <p
+                    className="text-center py-8"
+                    style={{ color: 'rgb(var(--color-text-secondary))' }}
+                  >
+                    아직 기도한 사람이 없습니다.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {prayersList.map((prayer, index) => (
+                      <motion.div
+                        key={`${prayer.id}-${prayer.prayedAt}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="flex items-center justify-between py-3 px-4 rounded-xl"
+                        style={{ backgroundColor: 'rgb(var(--color-bg-secondary))' }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                            style={{
+                              backgroundColor: 'rgb(var(--color-accent-blue))',
+                              color: 'white',
+                            }}
+                          >
+                            {prayer.name.charAt(0)}
+                          </div>
+                          <span
+                            className="font-medium"
+                            style={{ color: 'rgb(var(--color-text-primary))' }}
+                          >
+                            {prayer.name}
+                          </span>
+                        </div>
+                        <span
+                          className="text-sm"
+                          style={{ color: 'rgb(var(--color-text-tertiary))' }}
+                        >
+                          {new Date(prayer.prayedAt).toLocaleDateString('ko-KR')}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
