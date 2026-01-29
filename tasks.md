@@ -10,8 +10,8 @@
 
 | Phase | 상태 | 진행률 |
 |-------|------|--------|
-| Phase 1: Design System Foundation | 🔲 대기 | 0% |
-| Phase 2: Navigation & Layout | 🔲 대기 | 0% |
+| Phase 1: Design System Foundation | ✅ 완료 | 100% |
+| Phase 2: Navigation & Layout | ✅ 완료 | 100% |
 | Phase 3: Core Feature Enhancement | 🔲 대기 | 0% |
 | Phase 4: UX Polish | 🔲 대기 | 0% |
 | Phase 5: Backend Refactoring | 🔲 대기 | 0% |
@@ -26,52 +26,52 @@
 > 목표: 토스 스타일 디자인 시스템 기반 구축
 
 ### 1.1 디자인 토큰 설정
-- [ ] **1.1.1** Color System 정의 (Light/Dark Mode)
+- [x] **1.1.1** Color System 정의 (Light/Dark Mode)
   - Primary colors (인디고 블루 계열)
   - Semantic colors (success, warning, info)
   - Neutral colors (그레이 스케일)
   - Background & Text colors
-- [ ] **1.1.2** Typography Scale 설정
+- [x] **1.1.2** Typography Scale 설정
   - Pretendard Variable 폰트 적용
   - 11px ~ 34px 스케일 정의
   - Line height & Font weight 정의
-- [ ] **1.1.3** Spacing System (4px 기반)
-- [ ] **1.1.4** Border Radius 토큰
-- [ ] **1.1.5** Shadow System (Elevation)
+- [x] **1.1.3** Spacing System (4px 기반)
+- [x] **1.1.4** Border Radius 토큰
+- [x] **1.1.5** Shadow System (Elevation)
 
 ### 1.2 Tailwind 설정
-- [ ] **1.2.1** tailwind.config.ts 커스터마이징
+- [x] **1.2.1** tailwind.config.ts 커스터마이징
   - 디자인 토큰을 Tailwind 변수로 변환
   - Dark mode 설정 (class 기반)
-- [ ] **1.2.2** CSS 변수 글로벌 설정 (globals.css)
-- [ ] **1.2.3** 컴포넌트 유틸리티 클래스 정의
+- [x] **1.2.2** CSS 변수 글로벌 설정 (globals.css)
+- [x] **1.2.3** 컴포넌트 유틸리티 클래스 정의
 
 ### 1.3 기본 UI 컴포넌트
-- [ ] **1.3.1** Button 컴포넌트
+- [x] **1.3.1** Button 컴포넌트
   - Variants: primary, secondary, ghost, danger
   - Sizes: sm, md, lg
   - States: default, hover, active, disabled, loading
-- [ ] **1.3.2** Input 컴포넌트
+- [x] **1.3.2** Input 컴포넌트
   - Text, Textarea, Select
   - Validation states
   - Icon support
-- [ ] **1.3.3** Card 컴포넌트
+- [x] **1.3.3** Card 컴포넌트
   - 기본 카드, 인터랙티브 카드
   - Hover elevation 효과
-- [ ] **1.3.4** Badge 컴포넌트
+- [x] **1.3.4** Badge 컴포넌트
   - Status badges (기도중, 부분응답, 응답완료)
   - Category badges
-- [ ] **1.3.5** Avatar 컴포넌트
+- [x] **1.3.5** Avatar 컴포넌트
   - Image, Initial 타입
   - Sizes, Group 지원
-- [ ] **1.3.6** Skeleton 컴포넌트
+- [x] **1.3.6** Skeleton 컴포넌트
   - Shimmer 애니메이션
   - 다양한 형태 지원
 
 ### 1.4 Framer Motion 설정
-- [ ] **1.4.1** 애니메이션 variants 정의
-- [ ] **1.4.2** Spring config 프리셋
-- [ ] **1.4.3** 공통 트랜지션 설정
+- [x] **1.4.1** 애니메이션 variants 정의
+- [x] **1.4.2** Spring config 프리셋
+- [x] **1.4.3** 공통 트랜지션 설정
 
 ---
 
@@ -80,48 +80,48 @@
 > 목표: 앱 구조와 네비게이션 시스템 구축
 
 ### 2.1 하단 네비게이션
-- [ ] **2.1.1** BottomNav 컴포넌트 리팩토링
+- [x] **2.1.1** BottomNav 컴포넌트 리팩토링
   - 4개 탭: 홈, 기도, 응답, 내정보
   - Active indicator 애니메이션
   - Safe area 대응
-- [ ] **2.1.2** 라우트별 동적 메뉴 구성
-- [ ] **2.1.3** 스크롤 시 숨김/표시 옵션
+- [x] **2.1.2** 라우트별 동적 메뉴 구성
+- [x] **2.1.3** 스크롤 시 숨김/표시 옵션
 
 ### 2.2 헤더
-- [ ] **2.2.1** Header 컴포넌트 리팩토링
+- [x] **2.2.1** Header 컴포넌트 리팩토링
   - 글래스모피즘 효과 개선
   - 스크롤 반응형 스타일
-- [ ] **2.2.2** 동적 타이틀 시스템
-- [ ] **2.2.3** 액션 버튼 영역 표준화
+- [x] **2.2.2** 동적 타이틀 시스템
+- [x] **2.2.3** 액션 버튼 영역 표준화
 
 ### 2.3 바텀시트
-- [ ] **2.3.1** BottomSheet 컴포넌트 구현
+- [x] **2.3.1** BottomSheet 컴포넌트 구현
   - Drag handle
   - Snap points (50%, 90%)
   - Backdrop blur
   - Swipe to dismiss
-- [ ] **2.3.2** Keyboard aware 높이 조절
-- [ ] **2.3.3** 중첩 바텀시트 지원
+- [x] **2.3.2** Keyboard aware 높이 조절
+- [x] **2.3.3** 중첩 바텀시트 지원
 
 ### 2.4 모달 시스템
-- [ ] **2.4.1** Modal 컴포넌트 구현
+- [x] **2.4.1** Modal 컴포넌트 구현
   - Enter/Exit 애니메이션
   - Backdrop click to close
   - Focus trap
-- [ ] **2.4.2** Confirm Dialog
-- [ ] **2.4.3** Alert Dialog
+- [x] **2.4.2** Confirm Dialog
+- [x] **2.4.3** Alert Dialog
 
 ### 2.5 토스트 알림
-- [ ] **2.5.1** Toast 컴포넌트 구현
+- [x] **2.5.1** Toast 컴포넌트 구현
   - Success, Error, Info, Warning
   - Auto dismiss
   - Stack management
-- [ ] **2.5.2** useToast 훅 구현
+- [x] **2.5.2** useToast 훅 구현
 
 ### 2.6 페이지 전환
-- [ ] **2.6.1** Page transition 애니메이션
-- [ ] **2.6.2** Loading state 표준화
-- [ ] **2.6.3** Error boundary 구현
+- [x] **2.6.1** Page transition 애니메이션
+- [x] **2.6.2** Loading state 표준화
+- [x] **2.6.3** Error boundary 구현
 
 ---
 
