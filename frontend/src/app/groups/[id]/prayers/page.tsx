@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import PrayButton from '@/components/PrayButton';
 import { api, PrayerItem, PrayerStatus, Group } from '@/lib/api';
 
 const STATUS_LABELS: Record<PrayerStatus, string> = {
@@ -144,41 +145,66 @@ function PrayerListPage() {
         ) : (
           <div className="space-y-4">
             {items.map((item) => (
-              <Link
+              <div
                 key={item.id}
-                href={`/prayers/${item.id}`}
-                className="block bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 flex-1">
-                    {item.title}
-                  </h3>
-                  <span
-                    className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      STATUS_COLORS[item.status]
-                    }`}
-                  >
-                    {STATUS_LABELS[item.status]}
-                  </span>
-                </div>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {item.content}
-                </p>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <div className="flex items-center space-x-4">
-                    <span>{item.author.name}</span>
-                    {item.category && (
-                      <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
-                        {item.category}
+                <Link href={`/prayers/${item.id}`} className="block p-6">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                      {item.title}
+                    </h3>
+                    <span
+                      className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        STATUS_COLORS[item.status]
+                      }`}
+                    >
+                      {STATUS_LABELS[item.status]}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                    {item.content}
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="flex items-center space-x-4">
+                      <span>{item.author.name}</span>
+                      {item.category && (
+                        <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
+                          {item.category}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="flex items-center gap-1">
+                        🙏 {item._count.reactions}회
                       </span>
-                    )}
+                      <span className="text-gray-400">·</span>
+                      <span>{new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <span>기도 {item._count.reactions}회</span>
-                    <span>{new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
-                  </div>
+                </Link>
+                <div className="px-6 pb-4">
+                  <PrayButton
+                    prayerItemId={item.id}
+                    initialPrayCount={item._count.reactions}
+                    initialHasPrayedToday={item.hasPrayedToday}
+                    size="small"
+                    onPraySuccess={(newCount) => {
+                      setItems((prevItems) =>
+                        prevItems.map((prevItem) =>
+                          prevItem.id === item.id
+                            ? {
+                                ...prevItem,
+                                _count: { ...prevItem._count, reactions: newCount },
+                                hasPrayedToday: true,
+                              }
+                            : prevItem
+                        )
+                      );
+                    }}
+                  />
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}

@@ -97,6 +97,17 @@ interface PrayerItemsResponse {
   totalPages: number;
 }
 
+interface PrayerUpdate {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: {
+    id: string;
+    name: string;
+  };
+  isAuthor: boolean;
+}
+
 class ApiClient {
   private baseURL: string;
 
@@ -223,6 +234,49 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  // Prayer Updates
+  async createPrayerUpdate(prayerItemId: string, content: string): Promise<PrayerUpdate> {
+    return this.request<PrayerUpdate>(`/prayer-items/${prayerItemId}/updates`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  async getPrayerUpdates(prayerItemId: string): Promise<PrayerUpdate[]> {
+    return this.request<PrayerUpdate[]>(`/prayer-items/${prayerItemId}/updates`, {
+      method: 'GET',
+    });
+  }
+
+  async deletePrayerUpdate(updateId: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/prayer-updates/${updateId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Prayer Reactions
+  async pray(
+    prayerItemId: string
+  ): Promise<{ message: string; prayCount: number; hasPrayedToday: boolean }> {
+    return this.request<{ message: string; prayCount: number; hasPrayedToday: boolean }>(
+      `/prayer-items/${prayerItemId}/pray`,
+      {
+        method: 'POST',
+      }
+    );
+  }
+
+  async getPrayersList(
+    prayerItemId: string
+  ): Promise<{ id: string; name: string; prayedAt: string }[]> {
+    return this.request<{ id: string; name: string; prayedAt: string }[]>(
+      `/prayer-items/${prayerItemId}/prayers`,
+      {
+        method: 'GET',
+      }
+    );
+  }
 }
 
 export const api = new ApiClient(API_URL);
@@ -237,4 +291,5 @@ export type {
   CreatePrayerItemData,
   PrayerItem,
   PrayerItemsResponse,
+  PrayerUpdate,
 };

@@ -2,7 +2,7 @@
 
 Last updated: 2026-01-29
 
-## Current Status: Phase 4 Complete ✅ → Moving to Phase 5
+## Current Status: Phase 5 Complete ✅ → Moving to Phase 6
 
 ### Phase 1: Project Setup - Completed ✅
 - [x] IMPLEMENTATION_PLAN.md created
@@ -165,12 +165,47 @@ Last updated: 2026-01-29
 - [x] Group detail page updated with "기도제목 보기" button
 - [x] Frontend build verified ✅
 
+### Phase 5: Prayer Updates Timeline - Complete ✅
+
+**Backend Prayer Updates (완료 - Phase 4에서 구현됨)**:
+- [x] Prayer Updates module structure created (prayer-updates/)
+- [x] CreatePrayerUpdateDto with validation (5자 이상)
+- [x] Prayer Updates Service implementation
+  - Create update (author only)
+  - List updates by prayer item
+  - Delete update (author only)
+- [x] Prayer Updates Controller with endpoints:
+  - POST /prayer-items/:id/updates - Create update
+  - GET /prayer-items/:id/updates - List updates
+  - DELETE /prayer-updates/:id - Delete update
+- [x] Prayer Updates Module integrated into App Module
+- [x] All endpoints tested and working ✅
+
+**Frontend Prayer Updates (완료)**:
+- [x] API client extended with prayer update methods
+  - createPrayerUpdate, getPrayerUpdates, deletePrayerUpdate
+  - PrayerUpdate interface added
+- [x] Prayer detail page (/prayers/:id) updated with timeline
+  - Timeline UI with vertical line and dots
+  - Update creation form (author only, 5자 minimum)
+  - Character count display
+  - Time-ordered update list (newest first)
+  - Author name and timestamp display
+  - Delete button for each update (author only)
+  - Delete confirmation modal
+  - Mobile-first responsive design
+  - Loading and error states
+- [x] Mobile-optimized timeline styling
+  - Touch-friendly buttons (min 44x44px)
+  - Responsive text sizes
+  - Flexible layout for mobile/desktop
+- [x] Frontend build verified ✅
+
 ### In Progress 🔄
 None
 
 ### Next Steps 📋
-- Phase 5: Updates (기도제목 업데이트 타임라인)
-- Phase 6: Pray Together (함께 기도하기 버튼)
+- Phase 6: Pray Together (함께 기도하기 버튼) - Backend already implemented, Frontend completed
 
 ---
 
@@ -182,8 +217,8 @@ None
 | Phase 2: Auth System | ✅ Complete | 100% |
 | Phase 3: Group Features | ✅ Complete | 100% |
 | Phase 4: Prayer Core | ✅ Complete | 100% |
-| Phase 5: Updates | ⏳ Pending | 0% |
-| Phase 6: Pray Together | ⏳ Pending | 0% |
+| Phase 5: Updates | ✅ Complete | 100% |
+| Phase 6: Pray Together | ✅ Complete | 100% |
 | Phase 7: Answered Prayers | ⏳ Pending | 0% |
 | Phase 8: Comments (Optional) | ⏳ Pending | 0% |
 | Phase 9: My Page | ⏳ Pending | 0% |
