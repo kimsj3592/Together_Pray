@@ -262,45 +262,56 @@ function GroupDetailPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + index * 0.05 }}
-                className="flex items-center justify-between py-3 px-4 rounded-xl"
+                className="p-4 rounded-xl"
                 style={{ backgroundColor: 'rgb(var(--color-bg-secondary))' }}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium"
+                    className="w-11 h-11 rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0"
                     style={{ backgroundColor: 'rgb(var(--color-accent-blue))' }}
                   >
-                    {member.user.name.charAt(0)}
+                    {member.user.name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <div
-                      className="font-medium"
-                      style={{ color: 'rgb(var(--color-text-primary))' }}
-                    >
-                      {member.user.name}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span
+                        className="font-medium"
+                        style={{ color: 'rgb(var(--color-text-primary))' }}
+                      >
+                        {member.user.name}
+                      </span>
+                      {member.role === 'admin' && (
+                        <span
+                          className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            color: 'rgb(var(--color-accent-blue))',
+                          }}
+                        >
+                          <Shield size={10} />
+                          관리자
+                        </span>
+                      )}
                     </div>
                     <div
-                      className="text-sm"
+                      className="text-sm truncate mt-0.5"
                       style={{ color: 'rgb(var(--color-text-tertiary))' }}
                     >
                       {member.user.email}
                     </div>
+                    <div
+                      className="text-xs flex items-center gap-1 mt-1"
+                      style={{ color: 'rgb(var(--color-text-tertiary))' }}
+                    >
+                      <Calendar size={12} />
+                      {new Date(member.joinedAt).toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                      <span>가입</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {member.role === 'admin' && (
-                    <span className="badge-praying flex items-center gap-1">
-                      <Shield size={10} />
-                      관리자
-                    </span>
-                  )}
-                  <span
-                    className="text-xs flex items-center gap-1"
-                    style={{ color: 'rgb(var(--color-text-tertiary))' }}
-                  >
-                    <Calendar size={12} />
-                    {new Date(member.joinedAt).toLocaleDateString('ko-KR')}
-                  </span>
                 </div>
               </motion.div>
             ))}
