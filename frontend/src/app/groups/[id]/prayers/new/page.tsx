@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { FileText, Tag, EyeOff } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Header from '@/components/Header';
+import BottomNav from '@/components/BottomNav';
 import { api, Group } from '@/lib/api';
 
 const CATEGORIES = [
@@ -79,56 +82,101 @@ function CreatePrayerPage() {
 
   if (pageLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-600">로딩 중...</div>
+      <div className="min-h-screen bg-secondary">
+        <Header title="기도제목 작성" backHref="/groups" backLabel="그룹 목록" />
+        <div className="max-w-2xl mx-auto p-4">
+          <div className="card p-6 space-y-4">
+            <div className="skeleton h-8 w-1/2" />
+            <div className="skeleton h-12 w-full" />
+            <div className="skeleton h-32 w-full" />
+            <div className="skeleton h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!group) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+      <div className="min-h-screen bg-secondary">
+        <Header title="오류" backHref="/groups" backLabel="그룹 목록" />
+        <div className="max-w-2xl mx-auto p-4">
+          <div
+            className="p-4 rounded-xl"
+            style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              color: 'rgb(var(--color-accent-red))',
+            }}
+          >
             {error || '그룹을 찾을 수 없습니다.'}
           </div>
-          <Link href="/groups" className="text-blue-600 hover:text-blue-500">
-            ← 그룹 목록으로
-          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <Link
-            href={`/groups/${groupId}/prayers`}
-            className="text-blue-600 hover:text-blue-500"
-          >
-            ← 기도제목 목록으로
-          </Link>
-        </div>
+    <div className="min-h-screen bg-secondary pb-20 md:pb-6">
+      <Header
+        title="기도제목 작성"
+        backHref={`/groups/${groupId}/prayers`}
+        backLabel="기도제목 목록"
+      />
 
-        <div className="bg-white shadow rounded-lg p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">기도제목 작성</h1>
-          <p className="text-gray-500 mb-6">{group.name}</p>
+      <main className="max-w-2xl mx-auto px-4 py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card p-6"
+        >
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <div
+              className="p-2.5 rounded-xl"
+              style={{ backgroundColor: 'rgb(var(--color-bg-tertiary))' }}
+            >
+              <FileText size={24} style={{ color: 'rgb(var(--color-accent-blue))' }} />
+            </div>
+            <div>
+              <h1
+                className="text-xl font-bold"
+                style={{ color: 'rgb(var(--color-text-primary))' }}
+              >
+                기도제목 작성
+              </h1>
+              <p
+                className="text-sm"
+                style={{ color: 'rgb(var(--color-text-secondary))' }}
+              >
+                {group.name}
+              </p>
+            </div>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="p-4 rounded-xl"
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  color: 'rgb(var(--color-accent-red))',
+                }}
+              >
                 {error}
-              </div>
+              </motion.div>
             )}
 
+            {/* Title */}
             <div>
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium mb-2"
+                style={{ color: 'rgb(var(--color-text-primary))' }}
               >
-                제목 <span className="text-red-500">*</span>
+                제목 <span style={{ color: 'rgb(var(--color-accent-red))' }}>*</span>
               </label>
               <input
                 type="text"
@@ -136,17 +184,19 @@ function CreatePrayerPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="기도제목 제목을 입력하세요"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="input"
                 required
               />
             </div>
 
+            {/* Content */}
             <div>
               <label
                 htmlFor="content"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium mb-2"
+                style={{ color: 'rgb(var(--color-text-primary))' }}
               >
-                내용 <span className="text-red-500">*</span>
+                내용 <span style={{ color: 'rgb(var(--color-accent-red))' }}>*</span>
               </label>
               <textarea
                 id="content"
@@ -154,23 +204,28 @@ function CreatePrayerPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="기도제목 내용을 자세히 작성해주세요"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="input resize-none"
                 required
               />
             </div>
 
+            {/* Category */}
             <div>
               <label
                 htmlFor="category"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium mb-2"
+                style={{ color: 'rgb(var(--color-text-primary))' }}
               >
-                카테고리
+                <span className="flex items-center gap-2">
+                  <Tag size={16} style={{ color: 'rgb(var(--color-text-tertiary))' }} />
+                  카테고리
+                </span>
               </label>
               <select
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="input"
               >
                 <option value="">선택 안함</option>
                 {CATEGORIES.map((cat) => (
@@ -181,45 +236,76 @@ function CreatePrayerPage() {
               </select>
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="isAnonymous"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="isAnonymous"
-                className="ml-2 block text-sm text-gray-700"
-              >
-                익명으로 작성
+            {/* Anonymous Toggle */}
+            <div
+              className="p-4 rounded-xl"
+              style={{ backgroundColor: 'rgb(var(--color-bg-tertiary))' }}
+            >
+              <label className="flex items-start gap-3 cursor-pointer">
+                <div className="relative mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={isAnonymous}
+                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div
+                    className="w-10 h-6 rounded-full transition-colors peer-checked:bg-blue-500"
+                    style={{
+                      backgroundColor: isAnonymous
+                        ? 'rgb(var(--color-accent-blue))'
+                        : 'rgb(var(--color-border))',
+                    }}
+                  />
+                  <div
+                    className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"
+                    style={{
+                      transform: isAnonymous ? 'translateX(16px)' : 'translateX(0)',
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <div
+                    className="flex items-center gap-2 font-medium"
+                    style={{ color: 'rgb(var(--color-text-primary))' }}
+                  >
+                    <EyeOff size={16} />
+                    익명으로 작성
+                  </div>
+                  <p
+                    className="text-sm mt-1"
+                    style={{ color: 'rgb(var(--color-text-tertiary))' }}
+                  >
+                    다른 그룹 멤버들에게 작성자가 표시되지 않습니다.
+                  </p>
+                </div>
               </label>
             </div>
-            {isAnonymous && (
-              <p className="text-sm text-gray-500 -mt-4">
-                다른 그룹 멤버들에게 작성자가 표시되지 않습니다.
-              </p>
-            )}
 
-            <div className="flex justify-end space-x-3">
-              <Link
-                href={`/groups/${groupId}/prayers`}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={() => router.back()}
+                className="btn-secondary flex-1"
               >
                 취소
-              </Link>
-              <button
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary flex-1 disabled:opacity-50"
               >
                 {loading ? '작성 중...' : '작성하기'}
-              </button>
+              </motion.button>
             </div>
           </form>
-        </div>
-      </div>
+        </motion.div>
+      </main>
+
+      <BottomNav groupId={groupId} />
     </div>
   );
 }
