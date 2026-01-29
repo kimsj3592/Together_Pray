@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  groupMembers     GroupMember[]
+  prayerItems      PrayerItem[]
+  prayerReactions  PrayerReaction[]
+  comments         Comment[]
+
+  @@map("users")
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  inviteCode  String   @unique @map("invite_code")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  members     GroupMember[]
+  prayerItems PrayerItem[]
+
+  @@map("groups")
+}
+
+enum GroupRole {
+  admin
+  member
+}
+
+model GroupMember {
+  id       String    @id @default(uuid())
+  userId   String    @map("user_id")
+  groupId  String    @map("group_id")
+  role     GroupRole
+  joinedAt DateTime  @default(now()) @map("joined_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+  @@index([userId])
+  @@index([groupId])
+  @@map("group_members")
+}
+
+enum PrayerStatus {
+  praying         @map("기도중")
+  partial_answer  @map("부분 응답")
+  answered        @map("응답 완료")
+}
+
+model PrayerItem {
+  id          String        @id @default(uuid())
+  groupId     String        @map("group_id")
+  authorId    String        @map("author_id")
+  title       String
+  content     String
+  category    String?
+  status      PrayerStatus  @default(praying)
+  isAnonymous Boolean       @default(false) @map("is_anonymous")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  group    Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  author   User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  updates  PrayerUpdate[]
+  reactions PrayerReaction[]
+  comments Comment[]
+
+  @@index([groupId])
+  @@index([authorId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("prayer_items")
+}
+
+model PrayerUpdate {
+  id            String   @id @default(uuid())
+  prayerItemId  String   @map("prayer_item_id")
+  content       String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  prayerItem PrayerItem @relation(fields: [prayerItemId], references: [id], onDelete: Cascade)
+
+  @@map("prayer_updates")
+}
+
+model PrayerReaction {
+  id           String   @id @default(uuid())
+  prayerItemId String   @map("prayer_item_id")
+  userId       String   @map("user_id")
+  reactedAt    DateTime @default(now()) @map("reacted_at") @db.Date
+
+  prayerItem PrayerItem @relation(fields: [prayerItemId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([prayerItemId, userId, reactedAt])
+  @@index([prayerItemId])
+  @@index([userId])
+  @@map("prayer_reactions")
+}
+
+model Comment {
+  id           String   @id @default(uuid())
+  prayerItemId String   @map("prayer_item_id")
+  userId       String   @map("user_id")
+  content      String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  prayerItem PrayerItem @relation(fields: [prayerItemId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}

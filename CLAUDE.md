@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Frontend**: Next.js (App Router) + React + TypeScript + TailwindCSS
 - **Backend**: NestJS + TypeScript
-- **Database**: PostgreSQL + TypeORM
+- **Database**: PostgreSQL + Prisma
 - **Auth**: Email-based JWT authentication
 
 ## Architecture
@@ -61,7 +61,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd backend
 npm install
 cp .env.example .env  # Configure DB and JWT secrets
-npm run migration:run
+npx prisma generate
+npx prisma migrate dev
 npm run start:dev
 
 # Frontend
@@ -84,14 +85,20 @@ npm run test:e2e      # Playwright E2E tests
 
 ### Database
 ```bash
-# Generate migration
-npm run migration:generate -- -n MigrationName
+# Create migration
+npx prisma migrate dev --name migration_name
 
-# Run migrations
-npm run migration:run
+# Apply migrations
+npx prisma migrate deploy
 
-# Revert migration
-npm run migration:revert
+# Reset database (dev only)
+npx prisma migrate reset
+
+# Generate Prisma Client
+npx prisma generate
+
+# Open Prisma Studio
+npx prisma studio
 ```
 
 ## Development Principles

@@ -8,7 +8,7 @@
 - **기술 스택**:
   - Frontend: Next.js + React
   - Backend: NestJS
-  - Database: PostgreSQL
+  - Database: PostgreSQL + Prisma
   - Auth: Email-based authentication
 
 ---
@@ -23,7 +23,7 @@
 
 ### 1.2 백엔드 프로젝트 설정
 - [ ] NestJS 프로젝트 생성
-- [ ] TypeORM 설정
+- [ ] Prisma 설정
 - [ ] 환경변수 설정 (.env)
 - [ ] ESLint/Prettier 설정
 

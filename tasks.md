@@ -2,9 +2,9 @@
 
 Last updated: 2026-01-29
 
-## Current Status: Phase 1 - Project Setup
+## Current Status: Phase 1 Complete ✅ → Moving to Phase 2
 
-### Completed ✅
+### Phase 1: Project Setup - Completed ✅
 - [x] IMPLEMENTATION_PLAN.md created
 - [x] CLAUDE.md created for future Claude instances
 - [x] tasks.md created for progress tracking
@@ -15,30 +15,29 @@ Last updated: 2026-01-29
   - Auth & Security Specialist
   - Test Engineer
 - [x] Node.js v24.3.0 environment verified
-- [x] PostgreSQL 14.17 verified
+- [x] PostgreSQL 14.17 verified and started
 - [x] Git repository initialized (.gitignore created)
 - [x] Monorepo folder structure created (frontend/, backend/)
-- [x] Backend: NestJS project setup with TypeORM
-  - Dependencies installed (@nestjs/core, @nestjs/typeorm, typeorm, pg)
+- [x] Backend: NestJS project setup with Prisma
+  - Dependencies installed (@nestjs/core, @prisma/client@5.22.0, prisma@5.22.0)
   - Basic module structure created (main.ts, app.module.ts, app.controller.ts, app.service.ts)
   - TypeScript configured (tsconfig.json)
-  - .env.example created
+  - .env configured with DATABASE_URL
 - [x] Frontend: Next.js project setup with App Router
   - Next.js 16, React 19, TypeScript installed
   - TailwindCSS configured
   - App Router structure created (src/app/layout.tsx, page.tsx)
   - .env.local.example created
 - [x] Database ERD design (DATABASE_SCHEMA.md)
+- [x] PostgreSQL database 'together_pray' created
+- [x] Prisma initialized and configured
+- [x] Prisma schema created with all models (User, Group, GroupMember, PrayerItem, PrayerUpdate, PrayerReaction, Comment)
+- [x] Initial migration generated and applied (20260129074240_init)
 
 ### In Progress 🔄
 None
 
 ### Next Steps 📋
-
-#### Phase 1: Remaining Tasks
-- [ ] Create PostgreSQL database 'together_pray'
-- [ ] Create TypeORM entities based on schema
-- [ ] Generate and run initial database migration
 
 #### Phase 2: Auth System (2-3일)
 - [ ] User entity implementation
@@ -53,8 +52,8 @@ None
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| Phase 1: Project Setup | ✅ Complete | 90% |
-| Phase 2: Auth System | ⏳ Pending | 0% |
+| Phase 1: Project Setup | ✅ Complete | 100% |
+| Phase 2: Auth System | 🔄 Starting | 0% |
 | Phase 3: Group Features | ⏳ Pending | 0% |
 | Phase 4: Prayer Core | ⏳ Pending | 0% |
 | Phase 5: Updates | ⏳ Pending | 0% |
