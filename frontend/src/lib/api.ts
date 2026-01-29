@@ -20,6 +20,38 @@ interface AuthResponse {
   token: string;
 }
 
+interface CreateGroupData {
+  name: string;
+  description?: string;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  description: string | null;
+  inviteCode: string;
+  createdAt: string;
+  updatedAt: string;
+  members: GroupMember[];
+  _count?: {
+    members: number;
+    prayerItems: number;
+  };
+}
+
+interface GroupMember {
+  id: string;
+  userId: string;
+  groupId: string;
+  role: 'admin' | 'member';
+  joinedAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
 class ApiClient {
   private baseURL: string;
 
@@ -75,7 +107,34 @@ class ApiClient {
       method: 'GET',
     });
   }
+
+  // Groups
+  async createGroup(data: CreateGroupData): Promise<Group> {
+    return this.request<Group>('/groups', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getGroups(): Promise<Group[]> {
+    return this.request<Group[]>('/groups', {
+      method: 'GET',
+    });
+  }
+
+  async getGroup(id: string): Promise<Group> {
+    return this.request<Group>(`/groups/${id}`, {
+      method: 'GET',
+    });
+  }
+
+  async joinGroup(inviteCode: string): Promise<Group> {
+    return this.request<Group>('/groups/join', {
+      method: 'POST',
+      body: JSON.stringify({ inviteCode }),
+    });
+  }
 }
 
 export const api = new ApiClient(API_URL);
-export type { SignupData, LoginData, AuthResponse };
+export type { SignupData, LoginData, AuthResponse, CreateGroupData, Group, GroupMember };

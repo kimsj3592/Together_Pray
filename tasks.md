@@ -77,6 +77,50 @@ Last updated: 2026-01-29
 - [x] TailwindCSS configuration fixed (@tailwindcss/postcss)
 - [x] Full auth flow tested ✅
 
+### Phase 3: Group Features - Complete ✅
+
+**Backend Groups (완료)**:
+- [x] Groups module structure created
+- [x] Group DTOs (CreateGroupDto, JoinGroupDto) with validation
+- [x] Groups Service implementation
+  - Create group with auto-admin assignment
+  - List user's groups with member/prayer counts
+  - Get group details with membership check
+  - Join group by invite code
+  - Check membership and admin status
+- [x] UUID-based invite code generation
+- [x] Group membership guards (GroupMemberGuard, GroupAdminGuard)
+- [x] Groups Controller with endpoints:
+  - POST /groups - Create group
+  - GET /groups - List user's groups
+  - GET /groups/:id - Get group details
+  - POST /groups/join - Join by invite code
+- [x] Groups Module integrated into App Module
+- [x] All endpoints tested and working ✅
+
+**Frontend Groups (완료)**:
+- [x] API client extended with group methods
+- [x] Groups list page (/groups)
+  - Display all user's groups
+  - Show member count and prayer count
+  - Admin badge for owned groups
+  - Links to create and join groups
+- [x] Group create page (/groups/create)
+  - Name and description form
+  - Validation and error handling
+  - Auto-redirect to group detail after creation
+- [x] Group join page (/groups/join)
+  - Invite code input
+  - Join validation and error handling
+  - Auto-redirect to group detail after join
+- [x] Group detail page (/groups/:id)
+  - Group information display
+  - Member list with roles and join dates
+  - Invite code display and copy for admins
+  - Copy to clipboard functionality
+- [x] Home page redirects to /groups
+- [x] Full group flow tested ✅
+
 ### In Progress 🔄
 None
 
@@ -90,7 +134,7 @@ None
 |-------|--------|----------|
 | Phase 1: Project Setup | ✅ Complete | 100% |
 | Phase 2: Auth System | ✅ Complete | 100% |
-| Phase 3: Group Features | ⏳ Pending | 0% |
+| Phase 3: Group Features | ✅ Complete | 100% |
 | Phase 4: Prayer Core | ⏳ Pending | 0% |
 | Phase 5: Updates | ⏳ Pending | 0% |
 | Phase 6: Pray Together | ⏳ Pending | 0% |
