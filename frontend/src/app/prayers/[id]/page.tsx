@@ -497,7 +497,7 @@ function PrayerDetailPage() {
                                 className="font-medium"
                                 style={{ color: 'rgb(var(--color-text-primary))' }}
                               >
-                                {update.author.name}
+                                {update.author?.name || '익명'}
                               </span>
                               <span
                                 className="text-xs"
