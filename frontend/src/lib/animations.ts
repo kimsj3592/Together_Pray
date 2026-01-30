@@ -643,6 +643,59 @@ export const buttonProps: HTMLMotionProps<'button'> = {
 };
 
 // ================================================================================
+// UNIFIED INTERACTION ANIMATIONS
+// ================================================================================
+
+/**
+ * Standard button press animation props
+ * Usage: <motion.button {...unifiedButtonPress}>
+ */
+export const unifiedButtonPress: HTMLMotionProps<'button'> = {
+  whileTap: { scale: 0.95 },
+  transition: springConfig.snappy,
+};
+
+/**
+ * Standard card interaction animation props
+ * Usage: <motion.div {...unifiedCardInteraction}>
+ */
+export const unifiedCardInteraction: HTMLMotionProps<'div'> = {
+  whileHover: { y: -2, boxShadow: '0 8px 30px rgba(0,0,0,0.12)' },
+  whileTap: { scale: 0.98 },
+  transition: {
+    duration: 0.15,
+    ease: 'easeOut',
+  },
+};
+
+/**
+ * Stagger container for list animations
+ * Usage: <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+ */
+export const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+/**
+ * List item animation variant
+ * Usage: <motion.div variants={listItemAnimation}>
+ */
+export const listItemAnimation: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: transitions.normal,
+  },
+};
+
+// ================================================================================
 // REDUCED MOTION SUPPORT
 // ================================================================================
 

@@ -278,6 +278,30 @@ class ApiClient {
     );
   }
 
+  // Dashboard
+  async getDashboardStats(): Promise<{
+    praying: number;
+    partialAnswer: number;
+    answered: number;
+  }> {
+    return this.request<{
+      praying: number;
+      partialAnswer: number;
+      answered: number;
+    }>('/users/me/dashboard/stats', {
+      method: 'GET',
+    });
+  }
+
+  async getRecentPrayers(limit = 3): Promise<PrayerItem[]> {
+    const params = new URLSearchParams();
+    params.append('limit', limit.toString());
+
+    return this.request<PrayerItem[]>(`/users/me/dashboard/recent-prayers?${params.toString()}`, {
+      method: 'GET',
+    });
+  }
+
   // Mypage
   async getMyPrayerItems(page?: number, limit?: number): Promise<PrayerItemsResponse> {
     const params = new URLSearchParams();

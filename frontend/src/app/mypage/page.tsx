@@ -9,7 +9,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PrayerCard from '@/components/PrayerCard';
-import EmptyState from '@/components/EmptyState';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { PrayerListSkeleton } from '@/components/Skeleton';
 import { api, PrayerItem } from '@/lib/api';
 

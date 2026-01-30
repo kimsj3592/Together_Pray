@@ -23,7 +23,7 @@ export default function BottomNav({ groupId }: BottomNavProps) {
     ? [
         {
           href: `/groups/${groupId}`,
-          label: '홈',
+          label: '그룹',
           icon: <Home size={24} />,
           matchPattern: new RegExp(`^/groups/${groupId}$`),
         },
@@ -48,10 +48,16 @@ export default function BottomNav({ groupId }: BottomNavProps) {
       ]
     : [
         {
+          href: '/home',
+          label: '홈',
+          icon: <Home size={24} />,
+          matchPattern: /^\/home$/,
+        },
+        {
           href: '/groups',
           label: '그룹',
-          icon: <Home size={24} />,
-          matchPattern: /^\/groups$/,
+          icon: <Heart size={24} />,
+          matchPattern: /^\/groups/,
         },
         {
           href: '/mypage',

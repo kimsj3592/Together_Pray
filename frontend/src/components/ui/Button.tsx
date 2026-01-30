@@ -1,9 +1,10 @@
 'use client';
 
 import { forwardRef, ButtonHTMLAttributes } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { springConfig } from '@/lib/animations';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -36,7 +37,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={type}
         whileTap={{ scale: disabled || isLoading ? 1 : 0.95 }}
-        transition={{ duration: 0.1 }}
+        transition={springConfig.snappy}
         disabled={disabled || isLoading}
         className={cn(
           'inline-flex items-center justify-center font-medium transition-all duration-200 ease-in-out',

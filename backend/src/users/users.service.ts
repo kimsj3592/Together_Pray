@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { User } from '@prisma/client';
+import { User, PrayerStatus } from '@prisma/client';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
@@ -26,6 +26,140 @@ export class UsersService {
         password,
         name,
       },
+    });
+  }
+
+  async getDashboardStats(userId: string): Promise<{
+    praying: number;
+    partialAnswer: number;
+    answered: number;
+  }> {
+    // Get all groups the user is a member of
+    const userGroups = await this.prisma.groupMember.findMany({
+      where: { userId },
+      select: { groupId: true },
+    });
+
+    const groupIds = userGroups.map((g) => g.groupId);
+
+    if (groupIds.length === 0) {
+      return {
+        praying: 0,
+        partialAnswer: 0,
+        answered: 0,
+      };
+    }
+
+    // Count prayers by status across all user's groups
+    const [prayingCount, partialAnswerCount, answeredCount] = await Promise.all([
+      this.prisma.prayerItem.count({
+        where: {
+          groupId: { in: groupIds },
+          status: PrayerStatus.praying,
+        },
+      }),
+      this.prisma.prayerItem.count({
+        where: {
+          groupId: { in: groupIds },
+          status: PrayerStatus.partial_answer,
+        },
+      }),
+      this.prisma.prayerItem.count({
+        where: {
+          groupId: { in: groupIds },
+          status: PrayerStatus.answered,
+        },
+      }),
+    ]);
+
+    return {
+      praying: prayingCount,
+      partialAnswer: partialAnswerCount,
+      answered: answeredCount,
+    };
+  }
+
+  async getRecentPrayers(userId: string, limit: number) {
+    // Get all groups the user is a member of
+    const userGroups = await this.prisma.groupMember.findMany({
+      where: { userId },
+      select: { groupId: true },
+    });
+
+    const groupIds = userGroups.map((g) => g.groupId);
+
+    if (groupIds.length === 0) {
+      return [];
+    }
+
+    // Get recent prayer items from all user's groups
+    const prayerItems = await this.prisma.prayerItem.findMany({
+      where: {
+        groupId: { in: groupIds },
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        group: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        _count: {
+          select: {
+            reactions: true,
+            comments: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+
+    // Check if user has prayed today for each prayer item
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const prayerItemIds = prayerItems.map((item) => item.id);
+
+    const userReactions = await this.prisma.prayerReaction.findMany({
+      where: {
+        prayerItemId: { in: prayerItemIds },
+        userId,
+        reactedAt: {
+          gte: today,
+        },
+      },
+      select: {
+        prayerItemId: true,
+      },
+    });
+
+    const prayedTodaySet = new Set(userReactions.map((r) => r.prayerItemId));
+
+    // Format the response
+    return prayerItems.map((item) => {
+      const isAuthor = item.authorId === userId;
+
+      return {
+        id: item.id,
+        title: item.title,
+        content: item.content,
+        status: item.status,
+        isAnonymous: item.isAnonymous,
+        createdAt: item.createdAt,
+        author: item.isAnonymous && !isAuthor
+          ? { id: null, name: '익명' }
+          : item.author,
+        group: item.group,
+        hasPrayedToday: prayedTodaySet.has(item.id),
+        _count: item._count,
+      };
     });
   }
 

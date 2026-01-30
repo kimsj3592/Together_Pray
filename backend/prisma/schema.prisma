@@ -23,6 +23,8 @@ model User {
   prayerReactions  PrayerReaction[]
   comments         Comment[]
 
+  // Index for email lookup during authentication
+  @@index([email])
   @@map("users")
 }
 
@@ -37,6 +39,8 @@ model Group {
   members     GroupMember[]
   prayerItems PrayerItem[]
 
+  // Index for invite code lookup (already unique, but explicit for clarity)
+  @@index([inviteCode])
   @@map("groups")
 }
 
@@ -56,6 +60,8 @@ model GroupMember {
   group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@unique([userId, groupId])
+  // Composite index for membership queries with role check (isAdmin)
+  @@index([userId, groupId, role])
   @@index([userId])
   @@index([groupId])
   @@map("group_members")
@@ -85,6 +91,12 @@ model PrayerItem {
   reactions PrayerReaction[]
   comments Comment[]
 
+  // Composite index for filtering prayers by group and status (common query pattern)
+  @@index([groupId, status])
+  // Composite index for sorting prayers by creation time within a group
+  @@index([groupId, createdAt(sort: Desc)])
+  // Index for author's prayers lookup
+  @@index([authorId, createdAt(sort: Desc)])
   @@index([groupId])
   @@index([authorId])
   @@index([status])
@@ -100,6 +112,9 @@ model PrayerUpdate {
 
   prayerItem PrayerItem @relation(fields: [prayerItemId], references: [id], onDelete: Cascade)
 
+  // Index for fetching updates by prayer item ordered by time
+  @@index([prayerItemId, createdAt])
+  @@index([prayerItemId])
   @@map("prayer_updates")
 }
 
@@ -113,6 +128,10 @@ model PrayerReaction {
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([prayerItemId, userId, reactedAt])
+  // Composite index for checking if user already prayed today
+  @@index([prayerItemId, userId, reactedAt])
+  // Index for user's prayer history
+  @@index([userId, reactedAt(sort: Desc)])
   @@index([prayerItemId])
   @@index([userId])
   @@map("prayer_reactions")
@@ -129,5 +148,9 @@ model Comment {
   prayerItem PrayerItem @relation(fields: [prayerItemId], references: [id], onDelete: Cascade)
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // Index for fetching comments by prayer item ordered by time
+  @@index([prayerItemId, createdAt])
+  @@index([prayerItemId])
+  @@index([userId])
   @@map("comments")
 }

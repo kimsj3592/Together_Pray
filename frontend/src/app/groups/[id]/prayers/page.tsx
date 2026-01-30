@@ -4,14 +4,16 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, CheckCircle, Filter } from 'lucide-react';
+import { Plus, CheckCircle } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PrayerCard from '@/components/PrayerCard';
-import EmptyState from '@/components/EmptyState';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { PrayerListSkeleton } from '@/components/Skeleton';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { api, PrayerItem, PrayerStatus, Group } from '@/lib/api';
+import { staggerContainer, listItemAnimation, unifiedButtonPress } from '@/lib/animations';
 
 const STATUS_LABELS: Record<PrayerStatus | '', string> = {
   '': '전체',
@@ -112,123 +114,122 @@ function PrayerListPage() {
         backLabel={group?.name || '그룹'}
       />
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
-        {/* Filter & Actions */}
-        <div className="mb-6 space-y-4">
-          {/* Filter Pills */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {(Object.keys(STATUS_LABELS) as (PrayerStatus | '')[]).map((status) => (
-              <motion.button
-                key={status}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleFilterChange(status)}
-                className={`
-                  px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
-                  transition-all duration-200
-                  ${
+      <PullToRefresh onRefresh={loadPrayerItems} disabled={loading}>
+        <main className="max-w-2xl mx-auto px-4 py-6">
+          {/* Filter & Actions */}
+          <div className="mb-6 space-y-4">
+            {/* Filter Pills */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {(Object.keys(STATUS_LABELS) as (PrayerStatus | '')[]).map((status) => (
+                <motion.button
+                  key={status}
+                  {...unifiedButtonPress}
+                  onClick={() => handleFilterChange(status)}
+                  className={`
+                    px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
+                    transition-all duration-200
+                    ${
+                      statusFilter === status
+                        ? 'text-white shadow-md'
+                        : 'bg-tertiary hover:bg-[rgb(var(--color-border))]'
+                    }
+                  `}
+                  style={
                     statusFilter === status
-                      ? 'text-white shadow-md'
-                      : 'bg-tertiary hover:bg-[rgb(var(--color-border))]'
+                      ? { backgroundColor: 'rgb(var(--color-accent-blue))' }
+                      : { color: 'rgb(var(--color-text-secondary))' }
                   }
-                `}
-                style={
-                  statusFilter === status
-                    ? { backgroundColor: 'rgb(var(--color-accent-blue))' }
-                    : { color: 'rgb(var(--color-text-secondary))' }
-                }
-              >
-                {STATUS_LABELS[status]}
-              </motion.button>
-            ))}
+                >
+                  {STATUS_LABELS[status]}
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Link href={`/groups/${groupId}/prayers/new`} className="flex-1">
+                <motion.button
+                  {...unifiedButtonPress}
+                  className="btn-primary w-full flex items-center justify-center gap-2"
+                >
+                  <Plus size={20} />
+                  <span>기도제목 작성</span>
+                </motion.button>
+              </Link>
+
+              <Link href={`/groups/${groupId}/answered`}>
+                <motion.button
+                  {...unifiedButtonPress}
+                  className="btn-success flex items-center gap-2"
+                >
+                  <CheckCircle size={20} />
+                  <span className="hidden sm:inline">응답된 기도</span>
+                </motion.button>
+              </Link>
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            <Link href={`/groups/${groupId}/prayers/new`} className="flex-1">
+          {/* Prayer List */}
+          {loading ? (
+            <PrayerListSkeleton count={3} />
+          ) : items.length === 0 ? (
+            <EmptyState
+              type={statusFilter ? 'search' : 'prayers'}
+              title={statusFilter ? '해당 상태의 기도제목이 없습니다' : undefined}
+              description={statusFilter ? '다른 필터를 선택해보세요' : undefined}
+              actionLabel={!statusFilter ? '첫 기도제목 작성하기' : undefined}
+              actionHref={!statusFilter ? `/groups/${groupId}/prayers/new` : undefined}
+            />
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="space-y-4"
+            >
+              {items.map((item) => (
+                <motion.div
+                  key={item.id}
+                  variants={listItemAnimation}
+                >
+                  <PrayerCard
+                    item={item}
+                    onPraySuccess={(newCount) => handlePraySuccess(item.id, newCount)}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center items-center gap-4">
               <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                className="btn-primary w-full flex items-center justify-center gap-2"
+                {...unifiedButtonPress}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="btn-secondary disabled:opacity-50"
               >
-                <Plus size={20} />
-                <span>기도제목 작성</span>
+                이전
               </motion.button>
-            </Link>
-
-            <Link href={`/groups/${groupId}/answered`}>
+              <span
+                className="text-sm font-medium"
+                style={{ color: 'rgb(var(--color-text-secondary))' }}
+              >
+                {page} / {totalPages}
+              </span>
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="btn-success flex items-center gap-2"
+                {...unifiedButtonPress}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="btn-secondary disabled:opacity-50"
               >
-                <CheckCircle size={20} />
-                <span className="hidden sm:inline">응답된 기도</span>
+                다음
               </motion.button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Prayer List */}
-        {loading ? (
-          <PrayerListSkeleton count={3} />
-        ) : items.length === 0 ? (
-          <EmptyState
-            type={statusFilter ? 'search' : 'prayers'}
-            title={statusFilter ? '해당 상태의 기도제목이 없습니다' : undefined}
-            description={statusFilter ? '다른 필터를 선택해보세요' : undefined}
-            actionLabel={!statusFilter ? '첫 기도제목 작성하기' : undefined}
-            actionHref={!statusFilter ? `/groups/${groupId}/prayers/new` : undefined}
-          />
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
-          >
-            {items.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <PrayerCard
-                  item={item}
-                  onPraySuccess={(newCount) => handlePraySuccess(item.id, newCount)}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-8 flex justify-center items-center gap-4">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="btn-secondary disabled:opacity-50"
-            >
-              이전
-            </motion.button>
-            <span
-              className="text-sm font-medium"
-              style={{ color: 'rgb(var(--color-text-secondary))' }}
-            >
-              {page} / {totalPages}
-            </span>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="btn-secondary disabled:opacity-50"
-            >
-              다음
-            </motion.button>
-          </div>
-        )}
-      </main>
+            </div>
+          )}
+        </main>
+      </PullToRefresh>
 
       <BottomNav groupId={groupId} />
     </div>

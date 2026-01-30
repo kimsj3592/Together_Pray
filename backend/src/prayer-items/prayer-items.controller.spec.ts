@@ -1,36 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrayerItemsController } from './prayer-items.controller';
+import { PrayerItemsController } from '../presentation/controllers/prayer-items.controller';
 import { PrayerItemsService } from './prayer-items.service';
-import { CreatePrayerItemDto } from './dto/create-prayer-item.dto';
-import { UpdatePrayerStatusDto } from './dto/update-prayer-status.dto';
-import { PrayerStatus } from '@prisma/client';
+import { CreatePrayerItemDto } from '../application/dtos/prayers/create-prayer-item.dto';
+import { UpdatePrayerStatusDto } from '../application/dtos/prayers/update-prayer-status.dto';
+import { PrayerStatus } from '../core/entities/prayer-item.entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { CreatePrayerItemUseCase } from '../application/use-cases/prayers/create-prayer-item.use-case';
+import { GetPrayerItemsByGroupUseCase } from '../application/use-cases/prayers/get-prayer-items-by-group.use-case';
+import { GetPrayerItemUseCase } from '../application/use-cases/prayers/get-prayer-item.use-case';
+import { UpdatePrayerStatusUseCase } from '../application/use-cases/prayers/update-prayer-status.use-case';
+import { DeletePrayerItemUseCase } from '../application/use-cases/prayers/delete-prayer-item.use-case';
 
 describe('PrayerItemsController', () => {
   let controller: PrayerItemsController;
-  let prayerItemsService: PrayerItemsService;
 
-  const mockPrayerItemsService = {
-    create: jest.fn(),
-    findAllByGroup: jest.fn(),
-    findOne: jest.fn(),
-    updateStatus: jest.fn(),
-    delete: jest.fn(),
-  };
+  const mockCreatePrayerItemUseCase = { execute: jest.fn() };
+  const mockGetPrayerItemsByGroupUseCase = { execute: jest.fn() };
+  const mockGetPrayerItemUseCase = { execute: jest.fn() };
+  const mockUpdatePrayerStatusUseCase = { execute: jest.fn() };
+  const mockDeletePrayerItemUseCase = { execute: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PrayerItemsController],
       providers: [
-        {
-          provide: PrayerItemsService,
-          useValue: mockPrayerItemsService,
-        },
+        { provide: CreatePrayerItemUseCase, useValue: mockCreatePrayerItemUseCase },
+        { provide: GetPrayerItemsByGroupUseCase, useValue: mockGetPrayerItemsByGroupUseCase },
+        { provide: GetPrayerItemUseCase, useValue: mockGetPrayerItemUseCase },
+        { provide: UpdatePrayerStatusUseCase, useValue: mockUpdatePrayerStatusUseCase },
+        { provide: DeletePrayerItemUseCase, useValue: mockDeletePrayerItemUseCase },
       ],
     }).compile();
 
     controller = module.get<PrayerItemsController>(PrayerItemsController);
-    prayerItemsService = module.get<PrayerItemsService>(PrayerItemsService);
   });
 
   afterEach(() => {
@@ -51,7 +53,7 @@ describe('PrayerItemsController', () => {
         id: 'prayer-id',
         title: 'Test Prayer',
         content: 'Please pray for this',
-        status: PrayerStatus.praying,
+        status: PrayerStatus.PRAYING,
         isAnonymous: false,
         author: {
           id: 'user-id',
@@ -60,12 +62,15 @@ describe('PrayerItemsController', () => {
         createdAt: new Date(),
       };
 
-      mockPrayerItemsService.create.mockResolvedValue(expectedResult);
+      mockCreatePrayerItemUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.create(req, createDto);
 
       expect(result).toEqual(expectedResult);
-      expect(prayerItemsService.create).toHaveBeenCalledWith('user-id', createDto);
+      expect(mockCreatePrayerItemUseCase.execute).toHaveBeenCalledWith({
+        userId: 'user-id',
+        dto: createDto,
+      });
     });
 
     it('should create anonymous prayer item', async () => {
@@ -81,7 +86,7 @@ describe('PrayerItemsController', () => {
         id: 'prayer-id',
         title: 'Anonymous Prayer',
         content: 'Please pray',
-        status: PrayerStatus.praying,
+        status: PrayerStatus.PRAYING,
         isAnonymous: true,
         author: {
           name: '익명',
@@ -89,7 +94,7 @@ describe('PrayerItemsController', () => {
         createdAt: new Date(),
       };
 
-      mockPrayerItemsService.create.mockResolvedValue(expectedResult);
+      mockCreatePrayerItemUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.create(req, createDto);
 
@@ -108,12 +113,12 @@ describe('PrayerItemsController', () => {
           {
             id: 'prayer-1',
             title: 'Prayer 1',
-            status: PrayerStatus.praying,
+            status: PrayerStatus.PRAYING,
           },
           {
             id: 'prayer-2',
             title: 'Prayer 2',
-            status: PrayerStatus.praying,
+            status: PrayerStatus.PRAYING,
           },
         ],
         total: 2,
@@ -121,31 +126,31 @@ describe('PrayerItemsController', () => {
         limit: 20,
       };
 
-      mockPrayerItemsService.findAllByGroup.mockResolvedValue(expectedResult);
+      mockGetPrayerItemsByGroupUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.findAllByGroup(groupId, req);
 
       expect(result).toEqual(expectedResult);
-      expect(prayerItemsService.findAllByGroup).toHaveBeenCalledWith(
+      expect(mockGetPrayerItemsByGroupUseCase.execute).toHaveBeenCalledWith({
+        userId: 'user-id',
         groupId,
-        'user-id',
-        undefined,
-        1,
-        20,
-      );
+        status: undefined,
+        page: 1,
+        limit: 20,
+      });
     });
 
     it('should filter by status', async () => {
       const req = { user: { id: 'user-id' } };
       const groupId = 'group-id';
-      const status = PrayerStatus.answered;
+      const status = PrayerStatus.ANSWERED;
 
       const expectedResult = {
         items: [
           {
             id: 'prayer-1',
             title: 'Answered Prayer',
-            status: PrayerStatus.answered,
+            status: PrayerStatus.ANSWERED,
           },
         ],
         total: 1,
@@ -153,7 +158,7 @@ describe('PrayerItemsController', () => {
         limit: 20,
       };
 
-      mockPrayerItemsService.findAllByGroup.mockResolvedValue(expectedResult);
+      mockGetPrayerItemsByGroupUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.findAllByGroup(
         groupId,
@@ -163,20 +168,20 @@ describe('PrayerItemsController', () => {
         '20',
       );
 
-      expect(prayerItemsService.findAllByGroup).toHaveBeenCalledWith(
+      expect(mockGetPrayerItemsByGroupUseCase.execute).toHaveBeenCalledWith({
+        userId: 'user-id',
         groupId,
-        'user-id',
         status,
-        1,
-        20,
-      );
+        page: 1,
+        limit: 20,
+      });
     });
 
     it('should support custom pagination', async () => {
       const req = { user: { id: 'user-id' } };
       const groupId = 'group-id';
 
-      mockPrayerItemsService.findAllByGroup.mockResolvedValue({
+      mockGetPrayerItemsByGroupUseCase.execute.mockResolvedValue({
         items: [],
         total: 0,
         page: 2,
@@ -185,13 +190,13 @@ describe('PrayerItemsController', () => {
 
       await controller.findAllByGroup(groupId, req, undefined, '2', '10');
 
-      expect(prayerItemsService.findAllByGroup).toHaveBeenCalledWith(
+      expect(mockGetPrayerItemsByGroupUseCase.execute).toHaveBeenCalledWith({
+        userId: 'user-id',
         groupId,
-        'user-id',
-        undefined,
-        2,
-        10,
-      );
+        status: undefined,
+        page: 2,
+        limit: 10,
+      });
     });
   });
 
@@ -204,7 +209,7 @@ describe('PrayerItemsController', () => {
         id: prayerId,
         title: 'Test Prayer',
         content: 'Please pray for this',
-        status: PrayerStatus.praying,
+        status: PrayerStatus.PRAYING,
         author: {
           id: 'user-id',
           name: 'Test User',
@@ -213,15 +218,15 @@ describe('PrayerItemsController', () => {
         createdAt: new Date(),
       };
 
-      mockPrayerItemsService.findOne.mockResolvedValue(expectedResult);
+      mockGetPrayerItemUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.findOne(prayerId, req);
 
       expect(result).toEqual(expectedResult);
-      expect(prayerItemsService.findOne).toHaveBeenCalledWith(
-        prayerId,
-        'user-id',
-      );
+      expect(mockGetPrayerItemUseCase.execute).toHaveBeenCalledWith({
+        userId: 'user-id',
+        prayerItemId: prayerId,
+      });
     });
 
     it('should hide author for anonymous prayers', async () => {
@@ -237,7 +242,7 @@ describe('PrayerItemsController', () => {
         },
       };
 
-      mockPrayerItemsService.findOne.mockResolvedValue(expectedResult);
+      mockGetPrayerItemUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.findOne(prayerId, req);
 
@@ -248,7 +253,7 @@ describe('PrayerItemsController', () => {
       const req = { user: { id: 'user-id' } };
       const prayerId = 'non-existent-id';
 
-      mockPrayerItemsService.findOne.mockRejectedValue(
+      mockGetPrayerItemUseCase.execute.mockRejectedValue(
         new NotFoundException('Prayer item not found'),
       );
 
@@ -263,54 +268,54 @@ describe('PrayerItemsController', () => {
       const req = { user: { id: 'user-id' } };
       const prayerId = 'prayer-id';
       const updateDto: UpdatePrayerStatusDto = {
-        status: PrayerStatus.answered,
+        status: PrayerStatus.ANSWERED,
       };
 
       const expectedResult = {
         id: prayerId,
-        status: PrayerStatus.answered,
+        status: PrayerStatus.ANSWERED,
         updatedAt: new Date(),
       };
 
-      mockPrayerItemsService.updateStatus.mockResolvedValue(expectedResult);
+      mockUpdatePrayerStatusUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.updateStatus(prayerId, req, updateDto);
 
       expect(result).toEqual(expectedResult);
-      expect(prayerItemsService.updateStatus).toHaveBeenCalledWith(
-        prayerId,
-        'user-id',
-        updateDto,
-      );
+      expect(mockUpdatePrayerStatusUseCase.execute).toHaveBeenCalledWith({
+        userId: 'user-id',
+        prayerItemId: prayerId,
+        dto: updateDto,
+      });
     });
 
-    it('should allow status change to PARTIALLY_ANSWERED', async () => {
+    it('should allow status change to PARTIAL_ANSWER', async () => {
       const req = { user: { id: 'user-id' } };
       const prayerId = 'prayer-id';
       const updateDto: UpdatePrayerStatusDto = {
-        status: PrayerStatus.partial_answer,
+        status: PrayerStatus.PARTIAL_ANSWER,
       };
 
       const expectedResult = {
         id: prayerId,
-        status: PrayerStatus.partial_answer,
+        status: PrayerStatus.PARTIAL_ANSWER,
       };
 
-      mockPrayerItemsService.updateStatus.mockResolvedValue(expectedResult);
+      mockUpdatePrayerStatusUseCase.execute.mockResolvedValue(expectedResult);
 
       const result = await controller.updateStatus(prayerId, req, updateDto);
 
-      expect(result.status).toBe(PrayerStatus.partial_answer);
+      expect(result.status).toBe(PrayerStatus.PARTIAL_ANSWER);
     });
 
     it('should throw ForbiddenException when user is not author', async () => {
       const req = { user: { id: 'other-user-id' } };
       const prayerId = 'prayer-id';
       const updateDto: UpdatePrayerStatusDto = {
-        status: PrayerStatus.answered,
+        status: PrayerStatus.ANSWERED,
       };
 
-      mockPrayerItemsService.updateStatus.mockRejectedValue(
+      mockUpdatePrayerStatusUseCase.execute.mockRejectedValue(
         new ForbiddenException('Only author can update status'),
       );
 
@@ -325,24 +330,24 @@ describe('PrayerItemsController', () => {
       const req = { user: { id: 'user-id' } };
       const prayerId = 'prayer-id';
 
-      mockPrayerItemsService.delete.mockResolvedValue({
+      mockDeletePrayerItemUseCase.execute.mockResolvedValue({
         message: 'Prayer item deleted',
       });
 
       const result = await controller.delete(prayerId, req);
 
       expect(result).toEqual({ message: 'Prayer item deleted' });
-      expect(prayerItemsService.delete).toHaveBeenCalledWith(
-        prayerId,
-        'user-id',
-      );
+      expect(mockDeletePrayerItemUseCase.execute).toHaveBeenCalledWith({
+        userId: 'user-id',
+        prayerItemId: prayerId,
+      });
     });
 
     it('should throw ForbiddenException when user is not author', async () => {
       const req = { user: { id: 'other-user-id' } };
       const prayerId = 'prayer-id';
 
-      mockPrayerItemsService.delete.mockRejectedValue(
+      mockDeletePrayerItemUseCase.execute.mockRejectedValue(
         new ForbiddenException('Only author can delete'),
       );
 
@@ -355,7 +360,7 @@ describe('PrayerItemsController', () => {
       const req = { user: { id: 'user-id' } };
       const prayerId = 'non-existent-id';
 
-      mockPrayerItemsService.delete.mockRejectedValue(
+      mockDeletePrayerItemUseCase.execute.mockRejectedValue(
         new NotFoundException('Prayer item not found'),
       );
 

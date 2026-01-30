@@ -10,8 +10,8 @@ function HomePage() {
   const { user } = useAuth();
 
   useEffect(() => {
-    // Redirect to groups page
-    router.push('/groups');
+    // Redirect to home dashboard
+    router.push('/home');
   }, [router]);
 
   return (

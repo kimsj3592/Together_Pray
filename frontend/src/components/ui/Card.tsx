@@ -1,8 +1,9 @@
 'use client';
 
 import { forwardRef, HTMLAttributes } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { unifiedCardInteraction } from '@/lib/animations';
 
 export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className' | 'onAnimationStart' | 'onDrag' | 'onDragEnd' | 'onDragStart'> {
   interactive?: boolean;
@@ -16,9 +17,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       return (
         <motion.div
           ref={ref}
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
+          {...unifiedCardInteraction}
           onClick={onClick}
           className={cn(
             'bg-[rgb(var(--color-bg-card))]',

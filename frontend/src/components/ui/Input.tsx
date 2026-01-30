@@ -16,23 +16,34 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, leftIcon, rightIcon, className, disabled, ...props }, ref) => {
+  ({ label, error, leftIcon, rightIcon, className, disabled, id, required, ...props }, ref) => {
+    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = `${inputId}-error`;
+
     return (
       <div className="w-full">
         {label && (
-          <label className="block mb-2 text-[var(--font-size-sm)] font-medium text-[rgb(var(--color-text-primary))]">
+          <label
+            htmlFor={inputId}
+            className="block mb-2 text-[var(--font-size-sm)] font-medium text-[rgb(var(--color-text-primary))]"
+          >
             {label}
+            {required && <span className="text-[rgb(var(--color-error))] ml-1" aria-label="필수 입력">*</span>}
           </label>
         )}
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgb(var(--color-text-tertiary))]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgb(var(--color-text-tertiary))]" aria-hidden="true">
               {leftIcon}
             </div>
           )}
           <input
             ref={ref}
+            id={inputId}
             disabled={disabled}
+            required={required}
+            aria-invalid={error ? 'true' : 'false'}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
               'w-full px-4 py-3 min-h-[44px]',
               'rounded-[var(--radius-lg)]',
@@ -52,13 +63,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--color-text-tertiary))]">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--color-text-tertiary))]" aria-hidden="true">
               {rightIcon}
             </div>
           )}
         </div>
         {error && (
-          <p className="mt-1.5 text-[var(--font-size-xs)] text-[rgb(var(--color-error))]">
+          <p id={errorId} className="mt-1.5 text-[var(--font-size-xs)] text-[rgb(var(--color-error))]" role="alert">
             {error}
           </p>
         )}
@@ -70,17 +81,28 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = 'Input';
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, error, className, disabled, ...props }, ref) => {
+  ({ label, error, className, disabled, id, required, ...props }, ref) => {
+    const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = `${textareaId}-error`;
+
     return (
       <div className="w-full">
         {label && (
-          <label className="block mb-2 text-[var(--font-size-sm)] font-medium text-[rgb(var(--color-text-primary))]">
+          <label
+            htmlFor={textareaId}
+            className="block mb-2 text-[var(--font-size-sm)] font-medium text-[rgb(var(--color-text-primary))]"
+          >
             {label}
+            {required && <span className="text-[rgb(var(--color-error))] ml-1" aria-label="필수 입력">*</span>}
           </label>
         )}
         <textarea
           ref={ref}
+          id={textareaId}
           disabled={disabled}
+          required={required}
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={error ? errorId : undefined}
           className={cn(
             'w-full px-4 py-3',
             'rounded-[var(--radius-lg)]',
@@ -99,7 +121,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {error && (
-          <p className="mt-1.5 text-[var(--font-size-xs)] text-[rgb(var(--color-error))]">
+          <p id={errorId} className="mt-1.5 text-[var(--font-size-xs)] text-[rgb(var(--color-error))]" role="alert">
             {error}
           </p>
         )}

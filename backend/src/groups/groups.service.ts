@@ -6,11 +6,15 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { CacheService, CacheKeys, CacheTTL } from '../common/cache';
 import { randomUUID } from 'crypto';
 
 @Injectable()
 export class GroupsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cacheService: CacheService,
+  ) {}
 
   async create(userId: string, createGroupDto: CreateGroupDto) {
     const { name, description } = createGroupDto;
@@ -45,6 +49,9 @@ export class GroupsService {
         },
       },
     });
+
+    // Invalidate user's membership cache
+    await this.cacheService.invalidateUser(userId);
 
     return group;
   }
@@ -87,27 +94,36 @@ export class GroupsService {
   }
 
   async findOne(groupId: string, userId: string) {
-    const group = await this.prisma.group.findUnique({
-      where: { id: groupId },
-      include: {
-        members: {
+    // Try to get from cache first
+    const cacheKey = this.cacheService.generateKey(CacheKeys.GROUP, groupId);
+
+    const group = await this.cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        return this.prisma.group.findUnique({
+          where: { id: groupId },
           include: {
-            user: {
+            members: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+            _count: {
               select: {
-                id: true,
-                name: true,
-                email: true,
+                prayerItems: true,
               },
             },
           },
-        },
-        _count: {
-          select: {
-            prayerItems: true,
-          },
-        },
+        });
       },
-    });
+      CacheTTL.MEDIUM, // 5 minutes
+    );
 
     if (!group) {
       throw new NotFoundException('Group not found');
@@ -150,30 +166,71 @@ export class GroupsService {
       },
     });
 
+    // Invalidate caches
+    await Promise.all([
+      this.cacheService.invalidateGroup(group.id),
+      this.cacheService.invalidateMembership(userId, group.id),
+    ]);
+
     // Return updated group
     return this.findOne(group.id, userId);
   }
 
+  /**
+   * Check if user is a member of the group
+   * Uses caching for performance optimization
+   */
   async checkMembership(groupId: string, userId: string): Promise<boolean> {
-    const membership = await this.prisma.groupMember.findFirst({
-      where: {
-        groupId,
-        userId,
-      },
-    });
+    const cacheKey = this.cacheService.generateKey(
+      CacheKeys.MEMBERSHIP,
+      userId,
+      groupId,
+    );
 
-    return !!membership;
+    return this.cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const membership = await this.prisma.groupMember.findFirst({
+          where: {
+            groupId,
+            userId,
+          },
+          select: { id: true }, // Only select id for existence check
+        });
+
+        return !!membership;
+      },
+      CacheTTL.MEDIUM, // 5 minutes
+    );
   }
 
+  /**
+   * Check if user is admin of the group
+   * Uses optimized query with composite index
+   */
   async isAdmin(groupId: string, userId: string): Promise<boolean> {
-    const membership = await this.prisma.groupMember.findFirst({
-      where: {
-        groupId,
-        userId,
-        role: 'admin',
-      },
-    });
+    const cacheKey = this.cacheService.generateKey(
+      CacheKeys.MEMBERSHIP,
+      userId,
+      groupId,
+      'admin',
+    );
 
-    return !!membership;
+    return this.cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const membership = await this.prisma.groupMember.findFirst({
+          where: {
+            groupId,
+            userId,
+            role: 'admin',
+          },
+          select: { id: true }, // Only select id for existence check
+        });
+
+        return !!membership;
+      },
+      CacheTTL.MEDIUM, // 5 minutes
+    );
   }
 }

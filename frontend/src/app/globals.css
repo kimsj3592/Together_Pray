@@ -503,3 +503,53 @@ body {
     box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
   }
 }
+
+/* ===================================
+   Accessibility - Reduced Motion
+   =================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===================================
+   Accessibility - Focus Visible
+   =================================== */
+
+/* Remove default focus outline when not using keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Clear focus ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid rgb(var(--color-primary-500));
+  outline-offset: 2px;
+}
+
+/* Button focus styles */
+button:focus-visible {
+  outline: 2px solid rgb(var(--color-primary-500));
+  outline-offset: 2px;
+}
+
+/* Link focus styles */
+a:focus-visible {
+  outline: 2px solid rgb(var(--color-primary-500));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Input focus styles (already handled in component) */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none; /* Handled by component styles */
+}
